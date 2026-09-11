@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgm" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"    stop-color="#7c3aed"/>
+      <stop offset="1"    stop-color="#e11d48"/>
+    </linearGradient>
+    <linearGradient id="goldm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="140" fill="url(#bgm)"/>
+
+  <!-- Bold D letterform -->
+  <path d="M 150 130
+           L 150 382
+           L 240 382
+           Q 380 382 380 256
+           Q 380 130 240 130 Z
+           M 220 190
+           L 240 190
+           Q 310 190 310 256
+           Q 310 322 240 322
+           L 220 322 Z"
+        fill="#ffffff" fill-rule="evenodd"/>
+
+  <!-- Small gold star accent -->
+  <path d="M 400 90
+           C 404 108, 412 116, 430 120
+           C 412 124, 404 132, 400 150
+           C 396 132, 388 124, 370 120
+           C 388 116, 396 108, 400 90 Z"
+        fill="url(#goldm)"/>
+</svg>

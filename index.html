@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1a0b2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>DCF Aptitude Prep</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+  :root{
+    --bg:#0f0620; --bg2:#1a0b2e; --card:#221038; --card2:#2c1548;
+    --purple:#7c3aed; --purple2:#a855f7; --red:#e11d48; --green:#10b981;
+    --text:#f5f3ff; --muted:#a78bfa; --line:#3b1f63;
+    --shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;overscroll-behavior:none}
+  body{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+  #app{flex:1;display:flex;flex-direction:column;max-width:720px;margin:0 auto;width:100%}
+  button{font-family:inherit;font-size:1rem;cursor:pointer;border:none;outline:none}
+  .screen{flex:1;display:none;flex-direction:column;padding:20px;animation:fade .3s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .brand{text-align:center;margin:28px 0 8px}
+  .logo{width:78px;height:78px;border-radius:22px;background:linear-gradient(135deg,var(--purple),var(--red));
+    display:inline-flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;
+    box-shadow:var(--shadow);letter-spacing:-1px}
+  .brand h1{font-size:1.6rem;margin:16px 0 4px;letter-spacing:-.5px}
+  .brand p{color:var(--muted);margin:0;font-size:.92rem}
+  .hero-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;
+    margin:18px 0;box-shadow:var(--shadow)}
+  .hero-card h3{margin:0 0 12px;font-size:1.05rem;color:var(--purple2)}
+  .stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+  .stat-row:last-child{border-bottom:none}
+  .stat-row span:last-child{color:var(--muted)}
+  .btn{width:100%;padding:16px;border-radius:14px;font-weight:600;font-size:1.02rem;
+    transition:transform .15s,filter .15s;margin-top:10px}
+  .btn:active{transform:scale(.97)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:var(--shadow)}
+  .btn-red{background:linear-gradient(135deg,var(--red),#be123c);color:#fff;box-shadow:var(--shadow)}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn-row{display:flex;gap:10px}
+  .btn-row .btn{flex:1}
+  .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:.72rem;font-weight:600;
+    background:var(--card2);color:var(--purple2);border:1px solid var(--line)}
+
+  /* ---- SUBJECT PICKER ---- */
+  .subj-card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;
+    margin:10px 0;display:flex;align-items:center;gap:14px;cursor:pointer;
+    transition:all .18s;user-select:none}
+  .subj-card:active{transform:scale(.98)}
+  .subj-card.on{border-color:var(--purple2);background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(168,85,247,.08));
+    box-shadow:0 0 0 4px rgba(168,85,247,.08)}
+  .subj-icon{width:46px;height:46px;border-radius:12px;background:var(--card2);display:flex;
+    align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--purple2);flex-shrink:0}
+  .subj-card.on .subj-icon{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff}
+  .subj-meta{flex:1;min-width:0}
+  .subj-meta b{display:block;font-size:1rem}
+  .subj-meta small{color:var(--muted);font-size:.78rem}
+  .subj-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent;transition:all .18s}
+  .subj-card.on .subj-check{background:var(--purple2);border-color:var(--purple2);color:#fff}
+  .picker-actions{display:flex;gap:10px;margin:6px 0 4px}
+  .picker-actions .btn{margin-top:0;padding:10px;font-size:.9rem}
+
+  /* ---- TEST ---- */
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+  .pill{background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:7px 14px;font-size:.85rem;font-weight:600}
+  .timer{color:#fff;background:linear-gradient(135deg,var(--purple),var(--red))}
+  .timer.warn{animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.55}}
+  .progress{height:6px;background:var(--card);border-radius:99px;overflow:hidden;margin:10px 0 16px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--red));
+    transition:width .3s;border-radius:99px}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;
+    box-shadow:var(--shadow);flex:1;display:flex;flex-direction:column;overflow-y:auto}
+  .qmeta{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .passage{background:var(--bg2);border-left:3px solid var(--purple2);padding:12px 14px;
+    border-radius:10px;font-size:.9rem;color:#ddd6fe;margin-bottom:14px;line-height:1.65;
+    max-height:230px;overflow-y:auto}
+  .qtext{font-size:1.05rem;font-weight:600;margin:0 0 16px;line-height:1.55}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{background:var(--card2);border:1.5px solid transparent;border-radius:12px;padding:13px 15px;
+    text-align:left;color:var(--text);font-size:.95rem;display:flex;gap:12px;align-items:flex-start;
+    transition:all .15s;line-height:1.4}
+  .opt:active{transform:scale(.98)}
+  .opt .k{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:var(--muted)}
+  .opt.sel{border-color:var(--purple2);background:rgba(168,85,247,.15)}
+  .opt.sel .k{background:var(--purple2);color:#fff}
+  .opt.correct{border-color:var(--green);background:rgba(16,185,129,.15)}
+  .opt.correct .k{background:var(--green);color:#fff}
+  .opt.wrong{border-color:var(--red);background:rgba(225,29,72,.15)}
+  .opt.wrong .k{background:var(--red);color:#fff}
+  .opt:disabled{cursor:default;opacity:.85}
+  .nav{display:flex;gap:10px;margin-top:14px}
+  .nav .btn{margin-top:0}
+
+  .score-wrap{display:flex;justify-content:center;margin:10px 0 6px}
+  .score-ring{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    position:relative;background:conic-gradient(var(--purple) 0deg,var(--card) 0deg)}
+  .score-ring::after{content:'';position:absolute;inset:10px;border-radius:50%;background:var(--bg)}
+  .score-inner{position:relative;z-index:2;text-align:center}
+  .score-inner b{font-size:2.3rem;display:block;line-height:1}
+  .score-inner small{color:var(--muted);font-size:.8rem}
+  .verdict{text-align:center;font-size:1.15rem;font-weight:700;margin:8px 0 4px}
+  .verdict.pass{color:var(--green)}
+  .verdict.fail{color:var(--red)}
+  .breakdown{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+  .bar-row{margin:10px 0}
+  .bar-row .lbl{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:5px;color:var(--muted)}
+  .bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:99px;transition:width .6s}
+  .rec{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--purple2);
+    border-radius:12px;padding:13px 15px;margin:10px 0;font-size:.9rem}
+  .rec b{color:var(--purple2);display:block;margin-bottom:4px;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px}
+  .rec p{margin:0;color:#ddd6fe;line-height:1.55}
+
+  .rev-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+  .rev-item .qtext{font-size:.95rem;margin-bottom:10px}
+  .rev-tag{font-size:.7rem;padding:3px 8px;border-radius:99px;font-weight:600}
+  .rev-tag.correct{background:rgba(16,185,129,.2);color:var(--green)}
+  .rev-tag.wrong{background:rgba(225,29,72,.2);color:var(--red)}
+  .hidden{display:none!important}
+  .center{text-align:center}
+  .mt{margin-top:16px}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+
+  .logo{
+  width:88px; height:88px; border-radius:22px;
+  background:linear-gradient(135deg,var(--purple),var(--red));
+  display:inline-flex; align-items:center; justify-content:center;
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.logo svg{display:block}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ HOME ============ -->
+  <section id="scr-home" class="screen active">
+    <div class="logo" aria-label="DCF logo">
+  <svg viewBox="0 0 512 512" width="100%" height="100%" aria-hidden="true">
+    <defs>
+      <radialGradient id="hHalo" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stop-color="#fde68a" stop-opacity="0.85"/>
+        <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="256" cy="165" r="120" fill="url(#hHalo)"/>
+    <g stroke="#fde68a" stroke-width="4" stroke-linecap="round" opacity="0.6">
+      <line x1="256" y1="42"  x2="256" y2="66"/>
+      <line x1="152" y1="86"  x2="170" y2="104"/>
+      <line x1="360" y1="86"  x2="342" y2="104"/>
+      <line x1="108" y1="165" x2="140" y2="165"/>
+      <line x1="404" y1="165" x2="372" y2="165"/>
+    </g>
+    <path d="M 256 90 C 265 126.75, 282.25 138.75, 331 165
+             C 282.25 191.25, 265 203.25, 256 240
+             C 247 203.25, 229.75 191.25, 181 165
+             C 229.75 138.75, 247 126.75, 256 90 Z" fill="#fcd34d"/>
+    <path d="M 256 118 C 260 140, 268 148, 290 165
+             C 268 182, 260 190, 256 212
+             C 252 190, 244 182, 222 165
+             C 244 148, 252 140, 256 118 Z" fill="#fffbeb" opacity="0.9"/>
+    <path d="M 256 262 L 400 322 L 256 382 L 112 322 Z" fill="#ffffff"/>
+    <path d="M 190 350 L 322 350 L 305 424 Q 256 448 207 424 Z" fill="#ddd6fe"/>
+    <path d="M 400 322 Q 442 350 432 396 Q 424 434 396 450"
+          stroke="#fcd34d" stroke-width="11" stroke-linecap="round" fill="none"/>
+    <circle cx="392" cy="454" r="18" fill="#f59e0b"/>
+    <circle cx="386" cy="447" r="5"  fill="#fffbeb" opacity="0.85"/>
+  </svg>
+</div>
+
+    <div class="hero-card">
+      <h3>Test Format</h3>
+      <div class="stat-row"><span>Questions</span><span>60</span></div>
+      <div class="stat-row"><span>Duration</span><span>45 minutes</span></div>
+      <div class="stat-row"><span>Max score</span><span>600 points</span></div>
+      <div class="stat-row"><span>Pass mark</span><span>510 (85%)</span></div>
+      <div class="stat-row"><span>Subjects</span><span>English · Maths · General Knowledge</span></div>
+      <div class="stat-row"><span>Calculator</span><span>Not required</span></div>
+    </div>
+
+    <div class="hero-card" id="statsCard">
+      <h3>Your Progress</h3>
+      <div id="statsBody"><p style="color:var(--muted);font-size:.9rem;margin:0">No attempts yet. Take your first test.</p></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="App.showScreen('scr-subjects')">Start New Test</button>
+    <button class="btn btn-ghost" onclick="App.showScreen('scr-instructions')">How it works</button>
+    <button class="btn btn-ghost" onclick="App.resetPool()">Reset Question Pool</button>
+  </section>
+
+  <!-- ============ INSTRUCTIONS ============ -->
+  <section id="scr-instructions" class="screen">
+    <div class="brand" style="margin-top:10px"><h1 style="font-size:1.3rem">Instructions</h1></div>
+    <div class="hero-card">
+      <h3>1 · Choose Your Subjects</h3>
+      <p style="font-size:.92rem;color:#ddd6fe;margin:0">You may take a test on <b>one, two, or all three</b> subjects. The 60 questions are split evenly across whatever you choose, always keeping the Easy → Hard → Difficult progression.</p>
+    </div>
+    <div class="hero-card">
+      <h3>2 · Structure</h3>
+      <p style="font-size:.92rem;color:#ddd6fe;margin:0">Three difficulty tiers — <b>Easy (5 pts)</b>, <b>Hard (10 pts)</b>, <b>Difficult (15 pts)</b> — 20 questions each, always 60 total.</p>
+    </div>
+    <div class="hero-card">
+      <h3>3 · Timing</h3>
+      <p style="font-size:.92rem;color:#ddd6fe;margin:0">A single <b>45-minute countdown</b> for the entire test. Auto-submits at zero. Aim for ~45 seconds per question.</p>
+    </div>
+    <div class="hero-card">
+      <h3>4 · Scoring</h3>
+      <p style="font-size:.92rem;color:#ddd6fe;margin:0">Maximum = 600. You need <b>510 (85%)</b> to pass.</p>
+    </div>
+    <div class="hero-card">
+      <h3>5 · Rules</h3>
+      <p style="font-size:.92rem;color:#ddd6fe;margin:0">No calculator. Questions are drawn without repetition across attempts; options shuffle every time.</p>
+    </div>
+    <button class="btn btn-primary" onclick="App.showScreen('scr-subjects')">Choose Subjects</button>
+    <button class="btn btn-ghost" onclick="App.showScreen('scr-home')">Back</button>
+  </section>
+
+  <!-- ============ SUBJECT PICKER ============ -->
+  <section id="scr-subjects" class="screen">
+    <div class="brand" style="margin-top:6px">
+      <h1 style="font-size:1.35rem">Choose Your Subjects</h1>
+      <p>Pick one, two, or all three</p>
+    </div>
+
+    <div id="subjectList"></div>
+
+    <div class="picker-actions">
+      <button class="btn btn-ghost" onclick="App.selectAllSubjects()">Select All</button>
+      <button class="btn btn-ghost" onclick="App.clearAllSubjects()">Clear All</button>
+    </div>
+
+    <div class="hero-card" id="planPreview" style="margin-top:12px;padding:14px 18px">
+      <div class="stat-row"><span>Total questions</span><span id="planTotal">60</span></div>
+      <div class="stat-row"><span>Max score</span><span>600</span></div>
+      <div class="stat-row"><span>Duration</span><span>45 minutes</span></div>
+    </div>
+
+    <button class="btn btn-primary" id="beginBtn" onclick="App.confirmSubjects()">Begin Test</button>
+    <button class="btn btn-ghost" onclick="App.showScreen('scr-home')">Back</button>
+  </section>
+
+  <!-- ============ TEST ============ -->
+  <section id="scr-test" class="screen" style="padding:14px">
+    <div class="topbar">
+      <div class="pill" id="qCounter">Q 1 / 60</div>
+      <div class="pill timer" id="timer">45:00</div>
+    </div>
+    <div class="progress"><i id="progressBar" style="width:0%"></i></div>
+    <div class="qcard" id="qcard"></div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="App.prevQ()">Back</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="App.nextQ()">Next</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="scr-results" class="screen">
+    <div class="score-wrap">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-inner"><b id="scoreVal">0</b><small id="scorePct">0%</small></div>
+      </div>
+    </div>
+    <div class="verdict" id="verdict">—</div>
+    <div class="center" style="color:var(--muted);font-size:.85rem">Pass mark: 510 / 600</div>
+
+    <div class="breakdown">
+      <h3 style="margin:0 0 12px;font-size:1rem;color:var(--purple2)">Subject Breakdown</h3>
+      <div id="subjectBars"></div>
+    </div>
+
+    <div class="breakdown">
+      <h3 style="margin:0 0 12px;font-size:1rem;color:var(--purple2)">Difficulty Breakdown</h3>
+      <div id="diffBars"></div>
+    </div>
+
+    <h3 style="margin:20px 0 4px;font-size:1rem;color:var(--purple2)">Recommendations</h3>
+    <div id="recommendations"></div>
+
+    <div class="btn-row mt">
+      <button class="btn btn-ghost" onclick="App.showScreen('scr-review')">Review</button>
+      <button class="btn btn-primary" onclick="App.showScreen('scr-subjects')">Retake</button>
+    </div>
+    <button class="btn btn-ghost" onclick="App.showScreen('scr-home')">Home</button>
+  </section>
+
+  <!-- ============ REVIEW ============ -->
+  <section id="scr-review" class="screen">
+    <div class="topbar">
+      <h3 style="margin:0;font-size:1.1rem">Answer Review</h3>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;margin:0" onclick="App.showScreen('scr-results')">Back</button>
+    </div>
+    <div id="reviewBody" style="margin-top:12px"></div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   DCF APTITUDE PREP v2 — APP LOGIC
+   ========================================================= */
+const App = (() => {
+
+/* ---------- PASSAGES ---------- */
+const PASSAGES = {
+  /* -------- HARD passages -------- */
+  PH1: "The rise of remote work has quietly reshaped urban economies. Cities that once bustled with commuters now witness emptied office districts, while suburban coffee shops and co-working spaces thrive. Economists debate whether this shift is permanent or cyclical. Some argue that the gravitational pull of city centres — cultural amenities, networking, and serendipitous encounters — will eventually pull workers back. Others contend that the pandemic merely accelerated a transition already underway, driven by technology and changing worker preferences. What is clear is that the relationship between where people live and where they work has become more fluid than at any point in the past century.",
+  PH2: "Language is not merely a tool for communication; it is a repository of cultural memory. When a language dies, it takes with it unique ways of categorising the world, of expressing emotion, and of understanding time and kinship. Linguists estimate that a language disappears roughly every two weeks. Efforts to revitalise endangered languages — through immersion schools, digital archives, and community programmes — have met with mixed success. Yet even when a language is revived, some argue, it returns changed: a living language evolves, while a revived one often bears the imprint of the revivalists' own assumptions about what it should be.",
+  PH3: "Across sub-Saharan Africa, cities are growing at rates unmatched anywhere else on earth. Lagos alone adds roughly half a million residents annually. Yet this urbanisation is occurring largely without the industrial base that historically accompanied city growth in Europe and Asia. The result is a distinctive pattern: vibrant informal economies, sprawling low-density peripheries, and infrastructure that strains to keep pace. Some economists see in this a demographic dividend waiting to be unlocked; others warn of a coming crisis of unemployment, housing, and service delivery if governance does not adapt.",
+  PH4: "Thomas Kuhn argued that science does not advance by the steady accumulation of facts, but by periodic revolutions he called paradigm shifts. Normal science, in his view, operates within an accepted framework, solving puzzles that the framework itself defines. When anomalies accumulate — findings that the dominant paradigm cannot explain — a crisis ensues, and occasionally a new paradigm replaces the old. Critics note that Kuhn's account risks making scientific progress seem arbitrary, a matter of sociological fashion rather than rational inquiry. Defenders reply that he described how science actually works, not how philosophers wish it did.",
+
+  /* -------- DIFFICULT passages -------- */
+  PD1: "The concept of 'progress' has never been ideologically neutral. Enlightenment thinkers envisioned it as humanity's steady ascent toward reason and liberty; their critics, from Rousseau to the Romantics, saw it as a Faustian bargain that traded spiritual depth for material comfort. In the twentieth century, the horrors of two world wars and the spectre of environmental collapse further complicated the narrative. Today, debates about artificial intelligence, genetic engineering, and climate change force us to ask not merely whether progress is occurring, but whose conception of progress is being realised — and at what cost to those excluded from its benefits.",
+  PD2: "Historians have long debated whether their discipline can ever produce objective truth. The positivist tradition, dominant in the nineteenth century, held that careful archival work could recover the past 'as it really was'. The linguistic turn of the twentieth century challenged this confidence, arguing that historical narratives are shaped as much by the historian's own categories and rhetoric as by the evidence. Neither position has fully triumphed. Most working historians now accept that while the past is fixed, our accounts of it are inevitably partial, situated, and open to revision — yet still constrained by the documentary record.",
+  PD3: "The tension between liberty and equality has structured political philosophy for over two centuries. Libertarians argue that maximising individual freedom necessarily produces inequalities, and that this is just, provided the process was fair. Egalitarians counter that formal liberty is hollow without the material conditions to exercise it — that a person free to dine at the Ritz but unable to afford bread is not, in any meaningful sense, free. Between these poles, a spectrum of positions has emerged, each attempting to reconcile the two values without fully subordinating one to the other. No synthesis has won universal assent.",
+  PD4: "Contemporary artificial intelligence excels at pattern recognition across vast datasets, but it remains unclear whether this constitutes genuine understanding. Large language models produce fluent text without, apparently, any model of the world the text describes. Critics argue this is a fundamental limitation: without grounding in embodied experience or causal reasoning, such systems can only ever manipulate symbols. Optimists respond that understanding may simply be the successful prediction of future observations, in which case current systems already possess a rudimentary form of it. The debate turns, ultimately, on what we mean by 'understanding' — a question philosophy has yet to settle.",
+
+  /* -------- Additional HARD passages -------- */
+  PH5: "The newspaper industry has undergone a transformation as profound as any in its history. Where once a single editor decided what a city would read each morning, today's readers assemble their own front pages from social feeds, newsletters, and podcasts. Some celebrate this as a democratisation of information; others warn of echo chambers and the collapse of shared factual ground. What is beyond dispute is that the business model that sustained serious journalism for a century — advertising — has migrated to platforms that produce no journalism at all. Whether new models will fill the gap remains the defining question of the field.",
+
+  /* -------- Additional DIFFICULT passages -------- */
+  PD5: "Isaiah Berlin distinguished between two concepts of liberty. Negative liberty is freedom from interference — the absence of external constraints on what one may do. Positive liberty is freedom to realise one's true self, to be one's own master. Berlin warned that positive liberty, however attractive, can be perverted: if the state claims to know your 'real' will better than you do, it may coerce you 'for your own good'. Critics respond that negative liberty is hollow for those without the means to exercise it — that the freedom to starve is no freedom at all. The debate continues to structure arguments about welfare, rights, and the limits of state power."
+};
+
+/* =========================================================
+   QUESTION BANK — ~270 questions
+   Subject: english | math | gk
+   Diff:    easy | hard | difficult
+   ========================================================= */
+const BANK = [
+
+/* ══════════════════════ ENGLISH — EASY (30) ══════════════════════ */
+{id:'en-e1',subject:'english',diff:'easy',q:'The manager\'s ______ decision saved the company millions.',options:['astute','austere','audible','aural'],answer:0},
+{id:'en-e2',subject:'english',diff:'easy',q:'She was ______ about her plans; no one could guess them.',options:['secretive','selective','sedative','sensitive'],answer:0},
+{id:'en-e3',subject:'english',diff:'easy',q:'Choose the sentence with correct subject–verb agreement.',options:['Each of the boys has a book.','Each of the boys have a book.','Each of the boys are having a book.','Each of the boys were having a book.'],answer:0},
+{id:'en-e4',subject:'english',diff:'easy',q:'His ______ remarks offended everyone at the table.',options:['tactless','tactful','talented','tangible'],answer:0},
+{id:'en-e5',subject:'english',diff:'easy',q:'The river\'s ______ current made swimming dangerous.',options:['swift','swiftness','swiftly','swifter'],answer:0},
+{id:'en-e6',subject:'english',diff:'easy',q:'The ______ of the argument was clear to everyone.',options:['gist','jest','guest','gust'],answer:0},
+{id:'en-e7',subject:'english',diff:'easy',q:'Choose the correctly spelt word.',options:['accommodate','accomodate','acommodate','accomoddate'],answer:0},
+{id:'en-e8',subject:'english',diff:'easy',q:'The medicine was ______; it did nothing to ease the pain.',options:['ineffective','infectious','infective','infectiously'],answer:0},
+{id:'en-e9',subject:'english',diff:'easy',q:'He was ______ to admit his mistake.',options:['reluctant','resilient','resistant','resultant'],answer:0},
+{id:'en-e10',subject:'english',diff:'easy',q:'The building was ______ after the earthquake.',options:['demolished','depleted','deployed','deplored'],answer:0},
+{id:'en-e11',subject:'english',diff:'easy',q:'Her ______ smile put everyone at ease.',options:['genial','genius','genuine','genially'],answer:0},
+{id:'en-e12',subject:'english',diff:'easy',q:'Choose the correct pronoun: "Between you and ___, this is a secret."',options:['me','I','myself','mine'],answer:0},
+{id:'en-e13',subject:'english',diff:'easy',q:'The ______ of the matter is that we are out of time.',options:['crux','crust','cruse','crush'],answer:0},
+{id:'en-e14',subject:'english',diff:'easy',q:'Her ______ of the poem was moving.',options:['recitation','reparation','repetition','replication'],answer:0},
+{id:'en-e15',subject:'english',diff:'easy',q:'The evidence was ______; it proved nothing conclusively.',options:['inconclusive','inclusive','incisive','incipient'],answer:0},
+{id:'en-e16',subject:'english',diff:'easy',q:'The politician\'s speech was so ______ that even his critics applauded.',options:['eloquent','elusive','illicit','eminent'],answer:0},
+{id:'en-e17',subject:'english',diff:'easy',q:'He was ______ in his criticism, sparing no one\'s feelings.',options:['blunt','bland','blithe','bleak'],answer:0},
+{id:'en-e18',subject:'english',diff:'easy',q:'The flood caused ______ damage to the village.',options:['extensive','intensive','expansive','expensive'],answer:0},
+{id:'en-e19',subject:'english',diff:'easy',q:'The teacher\'s ______ approach made complex ideas accessible.',options:['lucid','lurid','livid','lucent'],answer:0},
+{id:'en-e20',subject:'english',diff:'easy',q:'Her ______ nature made her the life of every gathering.',options:['gregarious','garrulous','grandiose','gratuitous'],answer:0},
+{id:'en-e21',subject:'english',diff:'easy',q:'Choose the correct form: "Neither John nor his brothers ___ coming."',options:['are','is','was','has'],answer:0},
+{id:'en-e22',subject:'english',diff:'easy',q:'Choose the correctly spelt word.',options:['occurrence','occurence','ocurrence','occurrance'],answer:0},
+{id:'en-e23',subject:'english',diff:'easy',q:'The new policy, however ______ it may appear, has far-reaching consequences.',options:['innocuous','noxious','notorious','nebulous'],answer:0},
+{id:'en-e24',subject:'english',diff:'easy',q:'She spoke with such ______ that everyone believed her.',options:['conviction','convention','convenience','convection'],answer:0},
+{id:'en-e25',subject:'english',diff:'easy',q:'The suspect maintained his innocence despite ______ evidence.',options:['overwhelming','underwhelming','overbearing','overweening'],answer:0},
+{id:'en-e26',subject:'english',diff:'easy',q:'He was ______ for his punctuality.',options:['renowned','renounced','renown','announcing'],answer:0},
+{id:'en-e27',subject:'english',diff:'easy',q:'Choose the correct form: "The team ___ playing well today."',options:['is','are','were','have'],answer:0},
+{id:'en-e28',subject:'english',diff:'easy',q:'The ______ smell indicated something was burning.',options:['acrid','arid','acid','acidity'],answer:0},
+{id:'en-e29',subject:'english',diff:'easy',q:'Her explanation was ______ and to the point.',options:['succinct','sufficient','succulent','sullen'],answer:0},
+{id:'en-e30',subject:'english',diff:'easy',q:'His ______ manner made him popular with clients.',options:['affable','agile','anxious','angry'],answer:0},
+
+/* ══════════════════════ ENGLISH — HARD (30) ══════════════════════ */
+{id:'en-h1',subject:'english',diff:'hard',passage:'PH1',q:'The passage primarily discusses:',options:['the history of urban commuting','how remote work is changing urban economies','the decline of coffee shops in cities','why economists disagree about the pandemic'],answer:1},
+{id:'en-h2',subject:'english',diff:'hard',passage:'PH1',q:'The phrase "gravitational pull" in the passage most nearly means:',options:['a physical force','a strong attractive influence','a scientific principle','a source of conflict'],answer:1},
+{id:'en-h3',subject:'english',diff:'hard',passage:'PH1',q:'The author\'s stance on the debate is best described as:',options:['fully supportive of one side','neutral and observational','dismissive of economists','pessimistic about cities'],answer:1},
+{id:'en-h4',subject:'english',diff:'hard',passage:'PH1',q:'The word "serendipitous" in context most nearly means:',options:['planned','unexpectedly fortunate','expensive','crowded'],answer:1},
+{id:'en-h5',subject:'english',diff:'hard',passage:'PH2',q:'According to the passage, a language functions as:',options:['only a communication tool','a store of cultural knowledge','a fixed historical artefact','a barrier between cultures'],answer:1},
+{id:'en-h6',subject:'english',diff:'hard',passage:'PH2',q:'The word "repository" in context most nearly means:',options:['a warehouse for goods','a place where things are stored','a method of analysis','a person who studies languages'],answer:1},
+{id:'en-h7',subject:'english',diff:'hard',passage:'PH2',q:'The passage implies that revived languages:',options:['are identical to their original forms','may differ from their original forms','cannot be learned by new generations','are always successful'],answer:1},
+{id:'en-h8',subject:'english',diff:'hard',passage:'PH2',q:'The author\'s tone toward language revival efforts is best described as:',options:['unreservedly celebratory','cautiously qualified','openly hostile','entirely indifferent'],answer:1},
+{id:'en-h9',subject:'english',diff:'hard',passage:'PH3',q:'The passage suggests African urbanisation is distinctive because:',options:['it is slower than in Europe','it occurs largely without an industrial base','it is confined to a few cities','it is declining in pace'],answer:1},
+{id:'en-h10',subject:'english',diff:'hard',passage:'PH3',q:'The phrase "demographic dividend" most nearly means:',options:['a tax on population growth','an economic benefit from a favourable age structure','a government subsidy','a decline in birth rates'],answer:1},
+{id:'en-h11',subject:'english',diff:'hard',passage:'PH3',q:'The author\'s stance on the future of African cities is:',options:['unequivocally optimistic','unequivocally pessimistic','open to contrasting interpretations','purely statistical'],answer:2},
+{id:'en-h12',subject:'english',diff:'hard',passage:'PH3',q:'The word "sprawling" in context most nearly means:',options:['neatly organised','spread out irregularly','densely packed','deliberately planned'],answer:1},
+{id:'en-h13',subject:'english',diff:'hard',passage:'PH4',q:'According to the passage, Kuhn believed science advances through:',options:['steady accumulation of facts','periodic paradigm shifts','purely rational debate','government funding'],answer:1},
+{id:'en-h14',subject:'english',diff:'hard',passage:'PH4',q:'The word "anomalies" in the passage most nearly means:',options:['regular patterns','findings that do not fit the framework','scientific instruments','hiring practices'],answer:1},
+{id:'en-h15',subject:'english',diff:'hard',passage:'PH4',q:'Critics of Kuhn worry that his account:',options:['oversimplifies history','makes progress seem arbitrary','ignores scientific data','underestimates funding'],answer:1},
+{id:'en-h16',subject:'english',diff:'hard',passage:'PH4',q:'The author\'s attitude toward Kuhn is:',options:['uncritically supportive','balanced, presenting both views','openly dismissive','purely biographical'],answer:1},
+{id:'en-h17',subject:'english',diff:'hard',q:'Choose the grammatically correct sentence.',options:['The committee has reached its decision.','The committee have reached their decision.','The committee has reached their decision.','The committee have reached its decision.'],answer:0},
+{id:'en-h18',subject:'english',diff:'hard',q:'Had I known about the traffic, I ______ earlier.',options:['would have left','would leave','will leave','had left'],answer:0},
+{id:'en-h19',subject:'english',diff:'hard',q:'The scientist\'s findings were ______; they contradicted decades of accepted theory.',options:['heretical','hypothetical','hierarchical','harmonious'],answer:0},
+{id:'en-h20',subject:'english',diff:'hard',q:'The author\'s argument was ______ — it persuaded even the harshest sceptics.',options:['cogent','cognate','corpulent','covert'],answer:0},
+{id:'en-h21',subject:'english',diff:'hard',q:'The evidence was ______; the jury had no choice but to convict.',options:['incontrovertible','inconsequential','inconclusive','incongruous'],answer:0},
+{id:'en-h22',subject:'english',diff:'hard',q:'He was known for his ______ wit — sharp, spontaneous, and often cutting.',options:['acerbic','acidic','acrid','acrimonious'],answer:0},
+{id:'en-h23',subject:'english',diff:'hard',q:'Choose the sentence with no grammatical error.',options:['The reason is that he was late.','The reason is because he was late.','The reason is due to he was late.','The reason is because of he was late.'],answer:0},
+{id:'en-h24',subject:'english',diff:'hard',q:'The professor\'s ______ style, while admired by specialists, alienated general readers.',options:['recondite','reconnoitered','reconciled','recounting'],answer:0},
+{id:'en-h25',subject:'english',diff:'hard',q:'The scheme was ______: brilliant on paper, unworkable in practice.',options:['chimerical','charitable','chivalrous','chronological'],answer:0},
+{id:'en-h26',subject:'english',diff:'hard',q:'Her remarks were ______, designed to provoke rather than inform.',options:['inflammatory','informative','innocuous','inimitable'],answer:0},
+{id:'en-h27',subject:'english',diff:'hard',q:'The novel\'s plot was so ______ that readers struggled to follow it.',options:['convoluted','convenient','congenial','conspicuous'],answer:0},
+{id:'en-h28',subject:'english',diff:'hard',q:'He offered a ______ apology that convinced no one.',options:['perfunctory','punctual','peremptory','pertinent'],answer:0},
+{id:'en-h29',subject:'english',diff:'hard',q:'Choose the correctly constructed sentence.',options:['Hardly had he arrived when the meeting began.','Hardly he had arrived when the meeting began.','Hardly had he arrived than the meeting began.','Hardly had he arrived then the meeting began.'],answer:0},
+{id:'en-h30',subject:'english',diff:'hard',q:'The minister\'s ______ response sidestepped every direct question.',options:['evasive','evocative','equitable','erroneous'],answer:0},
+
+/* ══════════════════════ ENGLISH — DIFFICULT (30) ══════════════════════ */
+{id:'en-d1',subject:'english',diff:'difficult',passage:'PD1',q:'The primary purpose of the passage is to:',options:['define progress definitively','show that "progress" is a contested concept','argue against the Enlightenment','celebrate technological advance'],answer:1},
+{id:'en-d2',subject:'english',diff:'difficult',passage:'PD1',q:'The reference to a "Faustian bargain" suggests:',options:['a fair exchange','a deal with dangerous hidden costs','a religious ritual','a literary allusion with no relevance'],answer:1},
+{id:'en-d3',subject:'english',diff:'difficult',passage:'PD1',q:'The final sentence implies that debates about progress should consider:',options:['only economic growth','equity and distributional consequences','technological feasibility alone','historical precedent only'],answer:1},
+{id:'en-d4',subject:'english',diff:'difficult',passage:'PD1',q:'The word "spectre" in context most nearly means:',options:['a ghostly apparition','a threatening prospect','a political party','a scientific theory'],answer:1},
+{id:'en-d5',subject:'english',diff:'difficult',passage:'PD2',q:'The passage is primarily concerned with:',options:['the biography of positivist historians','whether history can produce objective truth','the history of archives','the rise of the linguistic turn'],answer:1},
+{id:'en-d6',subject:'english',diff:'difficult',passage:'PD2',q:'The phrase "the linguistic turn" most nearly refers to:',options:['a change of literary fashion','a shift toward analysing language and its role in shaping knowledge','a translation movement','a grammatical reform'],answer:1},
+{id:'en-d7',subject:'english',diff:'difficult',passage:'PD2',q:'The author\'s own position can best be described as:',options:['strictly positivist','strictly relativist','a middle ground acknowledging both constraint and partiality','indifferent'],answer:2},
+{id:'en-d8',subject:'english',diff:'difficult',passage:'PD2',q:'The word "situated" in context most nearly means:',options:['geographically located','shaped by context and perspective','financially secure','carefully documented'],answer:1},
+{id:'en-d9',subject:'english',diff:'difficult',passage:'PD3',q:'The central concern of the passage is:',options:['the history of political parties','the tension between liberty and equality','the economics of dining','the philosophy of language'],answer:1},
+{id:'en-d10',subject:'english',diff:'difficult',passage:'PD3',q:'The example of the person free to dine at the Ritz is used to:',options:['celebrate luxury','show that formal freedom without means is hollow','criticise rich people','illustrate a legal principle'],answer:1},
+{id:'en-d11',subject:'english',diff:'difficult',passage:'PD3',q:'The author\'s stance on the debate is:',options:['decisively on one side','that no synthesis has won universal assent','that the debate is meaningless','purely historical'],answer:1},
+{id:'en-d12',subject:'english',diff:'difficult',passage:'PD3',q:'The word "subordinating" in context most nearly means:',options:['placing in a lower rank','ordering alphabetically','making equal','financing'],answer:0},
+{id:'en-d13',subject:'english',diff:'difficult',passage:'PD4',q:'The passage is primarily about:',options:['the history of AI companies','whether AI possesses genuine understanding','how to build better computers','the ethics of automation'],answer:1},
+{id:'en-d14',subject:'english',diff:'difficult',passage:'PD4',q:'The phrase "manipulate symbols" in context implies:',options:['use of hand gestures','processing without real comprehension','writing code','mathematical proof'],answer:1},
+{id:'en-d15',subject:'english',diff:'difficult',passage:'PD4',q:'The optimists\' position rests on the assumption that:',options:['AI will always fail','understanding may equal successful prediction','philosophy is unnecessary','embodied experience is impossible'],answer:1},
+{id:'en-d16',subject:'english',diff:'difficult',passage:'PD4',q:'The passage\'s final sentence implies that the debate:',options:['is settled','turns on a philosophical question that remains open','is purely technical','is politically motivated'],answer:1},
+{id:'en-d17',subject:'english',diff:'difficult',q:'The politician\'s speech was a masterpiece of ______ — it said much while committing to nothing.',options:['equivocation','elucidation','elaboration','enumeration'],answer:0},
+{id:'en-d18',subject:'english',diff:'difficult',q:'Choose the grammatically correct sentence.',options:['The number of applicants has increased dramatically.','The number of applicants have increased dramatically.','A number of applicants has increased dramatically.','A number of applicants is increasing dramatically.'],answer:0},
+{id:'en-d19',subject:'english',diff:'difficult',q:'The novelist\'s prose, at once ______ and ______, captured both the grandeur and the squalor of the era.',options:['ornate … spare','verbose … terse','florid … baroque','plain … simple'],answer:0},
+{id:'en-d20',subject:'english',diff:'difficult',q:'Her argument was ______ — it seemed convincing but rested on unexamined assumptions.',options:['specious','spacious','splendid','Spartan'],answer:0},
+{id:'en-d21',subject:'english',diff:'difficult',q:'The politician\'s ______ denial — delivered in a monotone and lasting ten seconds — did little to quell the rumours.',options:['perfunctory','vociferous','vehement','strident'],answer:0},
+{id:'en-d22',subject:'english',diff:'difficult',q:'The author\'s prose is ______: every sentence seems weighed, every word deliberate.',options:['lapidary','lapsed','larcenous','latent'],answer:0},
+{id:'en-d23',subject:'english',diff:'difficult',q:'No sooner ______ the meeting begun than the fire alarm rang.',options:['had','has','did','was'],answer:0},
+{id:'en-d24',subject:'english',diff:'difficult',q:'The ______ of the committee\'s report obscured its few substantive recommendations.',options:['prolixity','proximity','probity','propensity'],answer:0},
+{id:'en-d25',subject:'english',diff:'difficult',q:'His ______ manner — charming on the surface, calculating beneath — fooled many.',options:['unctuous','uncertain','uncanny','unseemly'],answer:0},
+{id:'en-d26',subject:'english',diff:'difficult',q:'Identify the sentence that uses the semicolon correctly.',options:['I have a big test tomorrow; I can\'t go out tonight.','I have a big test tomorrow; because I need to study.','I have a big test; tomorrow; I can\'t go out.','I have a big test tomorrow, I can\'t go out; tonight.'],answer:0},
+{id:'en-d27',subject:'english',diff:'difficult',q:'The ______ of the evidence made it impossible for the defence to construct a coherent counter-narrative.',options:['inchoate','innocuous','inscrutable','intransigent'],answer:0},
+{id:'en-d28',subject:'english',diff:'difficult',q:'The critic\'s assessment was ______ — so qualified that it committed to nothing.',options:['nugatory','numerous','nuanced','nutritious'],answer:0},
+{id:'en-d29',subject:'english',diff:'difficult',q:'The historian\'s account was ______: it reconstructed the past from fragmentary evidence with great imaginative sympathy.',options:['elegiac','empirical','evocative','erroneous'],answer:2},
+{id:'en-d30',subject:'english',diff:'difficult',q:'His prose, ______ and allusive, demanded careful reading.',options:['elliptical','eloquent','elaborate','elated'],answer:0},
+
+/* ══════════════════════ MATHS — EASY (30) ══════════════════════ */
+{id:'ma-e1',subject:'math',diff:'easy',q:'What is 15% of 240?',options:['36','32','40','24'],answer:0},
+{id:'ma-e2',subject:'math',diff:'easy',q:'Solve: 3x + 7 = 22.',options:['5','6','4','7'],answer:0},
+{id:'ma-e3',subject:'math',diff:'easy',q:'A shirt costs ₦4,500 and is discounted by 20%. What is the new price?',options:['₦3,600','₦3,500','₦3,800','₦3,900'],answer:0},
+{id:'ma-e4',subject:'math',diff:'easy',q:'Simplify: 2/3 + 1/6.',options:['5/6','3/9','1/2','2/9'],answer:0},
+{id:'ma-e5',subject:'math',diff:'easy',q:'What is the next number: 2, 6, 12, 20, 30, ___?',options:['42','40','44','36'],answer:0},
+{id:'ma-e6',subject:'math',diff:'easy',q:'A rectangle has length 12 cm and width 5 cm. What is its area?',options:['60 cm²','34 cm²','17 cm²','30 cm²'],answer:0},
+{id:'ma-e7',subject:'math',diff:'easy',q:'What is the average of 8, 12, 16, and 20?',options:['14','15','16','13'],answer:0},
+{id:'ma-e8',subject:'math',diff:'easy',q:'If 5 pens cost ₦250, how much do 8 pens cost?',options:['₦400','₦350','₦450','₦500'],answer:0},
+{id:'ma-e9',subject:'math',diff:'easy',q:'Convert 0.375 to a fraction in lowest terms.',options:['3/8','3/7','5/8','2/5'],answer:0},
+{id:'ma-e10',subject:'math',diff:'easy',q:'What is 25% of 25% of 400?',options:['25','50','100','20'],answer:0},
+{id:'ma-e11',subject:'math',diff:'easy',q:'What is 7 × 8 − 12 ÷ 4?',options:['53','56','50','44'],answer:0},
+{id:'ma-e12',subject:'math',diff:'easy',q:'If a = 3 and b = 4, what is a² + b²?',options:['25','12','7','49'],answer:0},
+{id:'ma-e13',subject:'math',diff:'easy',q:'How many minutes are in 2.5 hours?',options:['150','120','140','160'],answer:0},
+{id:'ma-e14',subject:'math',diff:'easy',q:'What is 1/4 as a percentage?',options:['25%','40%','20%','14%'],answer:0},
+{id:'ma-e15',subject:'math',diff:'easy',q:'Simplify: 5 × 3 − 4 × 2 + 6.',options:['13','14','12','11'],answer:0},
+{id:'ma-e16',subject:'math',diff:'easy',q:'If a quarter of a number is 15, what is the number?',options:['60','45','75','30'],answer:0},
+{id:'ma-e17',subject:'math',diff:'easy',q:'What is the perimeter of a square of side 9 cm?',options:['36 cm','81 cm','18 cm','45 cm'],answer:0},
+{id:'ma-e18',subject:'math',diff:'easy',q:'Round 4,786 to the nearest hundred.',options:['4,800','4,700','4,790','4,900'],answer:0},
+{id:'ma-e19',subject:'math',diff:'easy',q:'What is the next number in the sequence: 1, 4, 9, 16, 25, ___?',options:['36','30','49','35'],answer:0},
+{id:'ma-e20',subject:'math',diff:'easy',q:'If 30% of a class are girls and there are 60 students, how many girls?',options:['18','20','15','24'],answer:0},
+{id:'ma-e21',subject:'math',diff:'easy',q:'Simplify: (2³)².',options:['64','32','16','128'],answer:0},
+{id:'ma-e22',subject:'math',diff:'easy',q:'What is 3/4 of 120?',options:['90','80','100','60'],answer:0},
+{id:'ma-e23',subject:'math',diff:'easy',q:'A train travels 180 km in 3 hours. What is its average speed?',options:['60 km/h','50 km/h','55 km/h','65 km/h'],answer:0},
+{id:'ma-e24',subject:'math',diff:'easy',q:'What is the value of 2⁵?',options:['32','25','10','64'],answer:0},
+{id:'ma-e25',subject:'math',diff:'easy',q:'How many sides does a hexagon have?',options:['6','5','7','8'],answer:0},
+{id:'ma-e26',subject:'math',diff:'easy',q:'If y = 2x and x = 7, what is y?',options:['14','9','5','72'],answer:0},
+{id:'ma-e27',subject:'math',diff:'easy',q:'What is the LCM of 6 and 8?',options:['24','48','12','14'],answer:0},
+{id:'ma-e28',subject:'math',diff:'easy',q:'Simplify: 0.25 + 0.75.',options:['1.00','0.90','1.10','0.50'],answer:0},
+{id:'ma-e29',subject:'math',diff:'easy',q:'A pencil costs ₦50. How much do 20 pencils cost?',options:['₦1,000','₦800','₦1,200','₦500'],answer:0},
+{id:'ma-e30',subject:'math',diff:'easy',q:'What is 100 ÷ 4 + 5?',options:['30','25','20','35'],answer:0},
+
+/* ══════════════════════ MATHS — HARD (30) ══════════════════════ */
+{id:'ma-h1',subject:'math',diff:'hard',q:'A car travels 240 km in 3 hours. If it increases its speed by 20 km/h, how long will it take to travel 300 km?',options:['3 h','3.5 h','4 h','2.5 h'],answer:0},
+{id:'ma-h2',subject:'math',diff:'hard',q:'If x + y = 10 and xy = 21, what is x² + y²?',options:['58','79','100','42'],answer:0},
+{id:'ma-h3',subject:'math',diff:'hard',q:'A sum of money doubles in 8 years at simple interest. What is the annual interest rate?',options:['12.5%','10%','8%','15%'],answer:0},
+{id:'ma-h4',subject:'math',diff:'hard',q:'The angles of a triangle are in the ratio 2:3:4. What is the largest angle?',options:['80°','90°','72°','60°'],answer:0},
+{id:'ma-h5',subject:'math',diff:'hard',q:'What is the probability of getting at least one head when flipping a fair coin three times?',options:['7/8','1/2','3/4','1/8'],answer:0},
+{id:'ma-h6',subject:'math',diff:'hard',q:'A trader buys an item for ₦2,000 and sells it for ₦2,500. What is the profit percentage?',options:['25%','20%','30%','15%'],answer:0},
+{id:'ma-h7',subject:'math',diff:'hard',q:'The ratio of boys to girls in a class is 3:5. If there are 40 students, how many girls are there?',options:['25','15','20','24'],answer:0},
+{id:'ma-h8',subject:'math',diff:'hard',q:'What is log₁₀(1000) + log₁₀(100)?',options:['5','4','3','6'],answer:0},
+{id:'ma-h9',subject:'math',diff:'hard',q:'One pipe fills a tank in 6 hours; another in 12 hours. Working together, how long to fill it?',options:['4 h','3 h','5 h','4.5 h'],answer:0},
+{id:'ma-h10',subject:'math',diff:'hard',q:'Find x: 2^(x+1) = 32.',options:['4','5','3','6'],answer:0},
+{id:'ma-h11',subject:'math',diff:'hard',q:'If a number is increased by 20% and then decreased by 20%, the net change is:',options:['4% decrease','no change','4% increase','20% decrease'],answer:0},
+{id:'ma-h12',subject:'math',diff:'hard',q:'The simple interest on ₦5,000 for 3 years at 8% per annum is:',options:['₦1,200','₦1,000','₦1,500','₦800'],answer:0},
+{id:'ma-h13',subject:'math',diff:'hard',q:'What is the LCM of 12, 15, and 20?',options:['60','120','180','300'],answer:0},
+{id:'ma-h14',subject:'math',diff:'hard',q:'If 2/5 of a number is 30, what is 3/5 of the same number?',options:['45','50','40','60'],answer:0},
+{id:'ma-h15',subject:'math',diff:'hard',q:'The mean of 5 numbers is 12. If one number is removed, the mean of the remaining 4 is 10. What was the removed number?',options:['20','15','18','22'],answer:0},
+{id:'ma-h16',subject:'math',diff:'hard',q:'Simplify: (3x²y)³ ÷ (9x³y²).',options:['3x³y','3xy','27x³y','x³y'],answer:0},
+{id:'ma-h17',subject:'math',diff:'hard',q:'A sum of ₦10,000 earns 5% compound interest per year. What is the total after 2 years?',options:['₦11,025','₦11,000','₦11,500','₦10,500'],answer:0},
+{id:'ma-h18',subject:'math',diff:'hard',q:'If sin θ = 3/5 and θ is acute, what is cos θ?',options:['4/5','5/4','3/4','5/3'],answer:0},
+{id:'ma-h19',subject:'math',diff:'hard',q:'The sum of two numbers is 25 and their difference is 5. What is their product?',options:['150','125','100','175'],answer:0},
+{id:'ma-h20',subject:'math',diff:'hard',q:'What is the next number: 1, 3, 6, 10, 15, ___?',options:['21','20','22','18'],answer:0},
+{id:'ma-h21',subject:'math',diff:'hard',q:'Solve: 5(x − 2) = 3x + 8.',options:['9','8','10','7'],answer:0},
+{id:'ma-h22',subject:'math',diff:'hard',q:'The area of a circle is 154 cm². Using π = 22/7, what is the radius?',options:['7 cm','14 cm','11 cm','22 cm'],answer:0},
+{id:'ma-h23',subject:'math',diff:'hard',q:'A bag contains 3 red, 4 blue, and 5 green balls. What is the probability of picking a non-red ball?',options:['3/4','1/4','1/3','2/3'],answer:0},
+{id:'ma-h24',subject:'math',diff:'hard',q:'If 4 men can complete a job in 6 days, how long will 3 men take (same rate)?',options:['8 days','7 days','9 days','6 days'],answer:0},
+{id:'ma-h25',subject:'math',diff:'hard',q:'What is the value of x if x/3 + x/4 = 7?',options:['12','10','14','8'],answer:0},
+{id:'ma-h26',subject:'math',diff:'hard',q:'A sum of money is shared in ratio 2:3:5. If the largest share is ₦250, what is the total?',options:['₦500','₦450','₦600','₦400'],answer:0},
+{id:'ma-h27',subject:'math',diff:'hard',q:'The hypotenuse of a right triangle is 13 cm; one leg is 5 cm. What is the other leg?',options:['12 cm','10 cm','8 cm','14 cm'],answer:0},
+{id:'ma-h28',subject:'math',diff:'hard',q:'Simplify: 5√2 + 3√2 − √2.',options:['7√2','9√2','6√2','8√2'],answer:0},
+{id:'ma-h29',subject:'math',diff:'hard',q:'If today is Wednesday, what day will it be 100 days from now?',options:['Friday','Thursday','Saturday','Sunday'],answer:0},
+{id:'ma-h30',subject:'math',diff:'hard',q:'The value of a car depreciates by 10% annually. If it costs ₦500,000 now, what is its value after 2 years?',options:['₦405,000','₦400,000','₦450,000','₦420,000'],answer:0},
+
+/* ══════════════════════ MATHS — DIFFICULT (30) ══════════════════════ */
+{id:'ma-d1',subject:'math',diff:'difficult',q:'The sum of the first n terms of an AP is Sₙ = 3n² + 2n. What is the 10th term?',options:['59','57','61','55'],answer:0},
+{id:'ma-d2',subject:'math',diff:'difficult',q:'If α and β are roots of x² − 5x + 6 = 0, what is α³ + β³?',options:['35','65','95','125'],answer:0},
+{id:'ma-d3',subject:'math',diff:'difficult',q:'A GP has first term 3 and common ratio 2. What is the sum of the first 6 terms?',options:['189','192','186','190'],answer:0},
+{id:'ma-d4',subject:'math',diff:'difficult',q:'In how many ways can the letters of the word "STATISTICS" be arranged?',options:['50,400','10,080','3,628,800','25,200'],answer:0},
+{id:'ma-d5',subject:'math',diff:'difficult',q:'A right circular cylinder has radius 7 cm and height 10 cm. Total surface area (π = 22/7):',options:['748 cm²','440 cm²','308 cm²','616 cm²'],answer:0},
+{id:'ma-d6',subject:'math',diff:'difficult',q:'If 2x + 3y = 12 and 3x − 2y = 5, find x + y.',options:['5','7','3','4'],answer:0},
+{id:'ma-d7',subject:'math',diff:'difficult',q:'A cone has base radius 3 cm and height 4 cm. What is its slant height?',options:['5 cm','7 cm','√7 cm','6 cm'],answer:0},
+{id:'ma-d8',subject:'math',diff:'difficult',q:'P(passes Math) = 0.7, P(passes English) = 0.6, independent. P(passes at least one) = ?',options:['0.88','0.42','0.58','0.82'],answer:0},
+{id:'ma-d9',subject:'math',diff:'difficult',q:'Simplify: (√5 + √3)(√5 − √3).',options:['2','8','√2','4'],answer:0},
+{id:'ma-d10',subject:'math',diff:'difficult',q:'The 3rd term of a GP is 12 and the 6th term is 96. What is the first term?',options:['3','4','6','2'],answer:0},
+{id:'ma-d11',subject:'math',diff:'difficult',q:'If log₂(x) = 5, what is x?',options:['32','25','10','64'],answer:0},
+{id:'ma-d12',subject:'math',diff:'difficult',q:'The sum of an infinite GP with first term 8 and common ratio 1/2 is:',options:['16','12','24','8'],answer:0},
+{id:'ma-d13',subject:'math',diff:'difficult',q:'Find sin 30° + cos 60°.',options:['1','1/2','√3/2','0'],answer:0},
+{id:'ma-d14',subject:'math',diff:'difficult',q:'A bag has 4 red and 6 blue balls. Two balls are drawn without replacement. P(both red) = ?',options:['2/15','4/25','1/5','8/45'],answer:0},
+{id:'ma-d15',subject:'math',diff:'difficult',q:'If f(x) = 2x² − 3x + 1, what is f(−2)?',options:['15','11','9','3'],answer:0},
+{id:'ma-d16',subject:'math',diff:'difficult',q:'Solve for x: x² − 7x + 12 = 0.',options:['x = 3 or 4','x = 2 or 6','x = 1 or 12','x = −3 or −4'],answer:0},
+{id:'ma-d17',subject:'math',diff:'difficult',q:'The 4th term of an AP is 15 and the 9th is 35. What is the first term?',options:['3','5','7','1'],answer:0},
+{id:'ma-d18',subject:'math',diff:'difficult',q:'Find the gradient of the line passing through (2, 3) and (5, 12).',options:['3','2','4','1/3'],answer:0},
+{id:'ma-d19',subject:'math',diff:'difficult',q:'A committee of 3 is to be formed from 7 people. How many possible committees?',options:['35','21','42','210'],answer:0},
+{id:'ma-d20',subject:'math',diff:'difficult',q:'If tan θ = 1 and 0° < θ < 90°, what is θ?',options:['45°','30°','60°','90°'],answer:0},
+{id:'ma-d21',subject:'math',diff:'difficult',q:'Simplify: log₂(8) × log₃(9).',options:['6','5','4','8'],answer:0},
+{id:'ma-d22',subject:'math',diff:'difficult',q:'The volume of a sphere with radius 3 cm (π = 22/7) is approximately:',options:['113 cm³','36 cm³','108 cm³','84 cm³'],answer:0},
+{id:'ma-d23',subject:'math',diff:'difficult',q:'A geometric series has first term 5 and sum to infinity 10. What is the common ratio?',options:['1/2','1/3','2/3','1/4'],answer:0},
+{id:'ma-d24',subject:'math',diff:'difficult',q:'If α and β are roots of 2x² − 5x + 3 = 0, what is α + β?',options:['5/2','3/2','−5/2','−3/2'],answer:0},
+{id:'ma-d25',subject:'math',diff:'difficult',q:'Solve: |2x − 5| = 7.',options:['x = 6 or −1','x = 6 only','x = −1 only','x = 2 or 3'],answer:0},
+{id:'ma-d26',subject:'math',diff:'difficult',q:'The 5th term of a GP is 48 and the common ratio is 2. What is the first term?',options:['3','6','12','4'],answer:0},
+{id:'ma-d27',subject:'math',diff:'difficult',q:'Two dice are rolled. What is P(sum = 7)?',options:['1/6','1/9','5/36','1/12'],answer:0},
+{id:'ma-d28',subject:'math',diff:'difficult',q:'Simplify: (x² − 9) ÷ (x − 3).',options:['x + 3','x − 3','x² − 3','x² + 3'],answer:0},
+{id:'ma-d29',subject:'math',diff:'difficult',q:'The gradient of y = 3x² − 4x + 1 at x = 2 is:',options:['8','6','10','12'],answer:0},
+{id:'ma-d30',subject:'math',diff:'difficult',q:'A regular polygon has interior angles of 150°. How many sides does it have?',options:['12','10','8','15'],answer:0},
+
+/* ══════════════════════ GK — EASY (30) ══════════════════════ */
+{id:'gk-e1',subject:'gk',diff:'easy',q:'Which planet is known as the "Red Planet"?',options:['Mars','Venus','Jupiter','Mercury'],answer:0},
+{id:'gk-e2',subject:'gk',diff:'easy',q:'What is the capital of Australia?',options:['Canberra','Sydney','Melbourne','Perth'],answer:0},
+{id:'gk-e3',subject:'gk',diff:'easy',q:'Who invented the telephone?',options:['Alexander Graham Bell','Thomas Edison','Nikola Tesla','Guglielmo Marconi'],answer:0},
+{id:'gk-e4',subject:'gk',diff:'easy',q:'The longest river in Africa is:',options:['Nile','Congo','Niger','Zambezi'],answer:0},
+{id:'gk-e5',subject:'gk',diff:'easy',q:'What is the chemical symbol for gold?',options:['Au','Go','Gd','Ag'],answer:0},
+{id:'gk-e6',subject:'gk',diff:'easy',q:'How many continents are there on Earth?',options:['7','5','6','8'],answer:0},
+{id:'gk-e7',subject:'gk',diff:'easy',q:'How many bones are in an adult human body?',options:['206','208','300','250'],answer:0},
+{id:'gk-e8',subject:'gk',diff:'easy',q:'Which organelle is known as the "powerhouse of the cell"?',options:['Mitochondria','Nucleus','Ribosome','Chloroplast'],answer:0},
+{id:'gk-e9',subject:'gk',diff:'easy',q:'Who wrote the play "Romeo and Juliet"?',options:['William Shakespeare','Charles Dickens','Jane Austen','Mark Twain'],answer:0},
+{id:'gk-e10',subject:'gk',diff:'easy',q:'The headquarters of the United Nations is in:',options:['New York','Geneva','Paris','London'],answer:0},
+{id:'gk-e11',subject:'gk',diff:'easy',q:'The largest ocean on Earth is:',options:['Pacific','Atlantic','Indian','Arctic'],answer:0},
+{id:'gk-e12',subject:'gk',diff:'easy',q:'Which vitamin is obtained from sunlight?',options:['Vitamin D','Vitamin A','Vitamin B','Vitamin C'],answer:0},
+{id:'gk-e13',subject:'gk',diff:'easy',q:'The capital of Canada is:',options:['Ottawa','Toronto','Vancouver','Montreal'],answer:0},
+{id:'gk-e14',subject:'gk',diff:'easy',q:'At sea level, water boils at:',options:['100°C','90°C','110°C','120°C'],answer:0},
+{id:'gk-e15',subject:'gk',diff:'easy',q:'The largest planet in the solar system is:',options:['Jupiter','Saturn','Neptune','Earth'],answer:0},
+{id:'gk-e16',subject:'gk',diff:'easy',q:'What is the capital of Nigeria?',options:['Abuja','Lagos','Kano','Ibadan'],answer:0},
+{id:'gk-e17',subject:'gk',diff:'easy',q:'Which is the smallest continent?',options:['Australia','Europe','Antarctica','South America'],answer:0},
+{id:'gk-e18',subject:'gk',diff:'easy',q:'The human heart has how many chambers?',options:['4','2','3','5'],answer:0},
+{id:'gk-e19',subject:'gk',diff:'easy',q:'Who was the first President of the United States?',options:['George Washington','Thomas Jefferson','Abraham Lincoln','John Adams'],answer:0},
+{id:'gk-e20',subject:'gk',diff:'easy',q:'The chemical formula for water is:',options:['H₂O','CO₂','O₂','H₂O₂'],answer:0},
+{id:'gk-e21',subject:'gk',diff:'easy',q:'Which continent is the Sahara Desert located in?',options:['Africa','Asia','Australia','South America'],answer:0},
+{id:'gk-e22',subject:'gk',diff:'easy',q:'What is the largest mammal?',options:['Blue whale','Elephant','Giraffe','Hippopotamus'],answer:0},
+{id:'gk-e23',subject:'gk',diff:'easy',q:'The Nigerian flag has how many colours?',options:['2','3','4','1'],answer:0},
+{id:'gk-e24',subject:'gk',diff:'easy',q:'Which gas do plants absorb during photosynthesis?',options:['Carbon dioxide','Oxygen','Nitrogen','Hydrogen'],answer:0},
+{id:'gk-e25',subject:'gk',diff:'easy',q:'The capital of Egypt is:',options:['Cairo','Alexandria','Luxor','Giza'],answer:0},
+{id:'gk-e26',subject:'gk',diff:'easy',q:'Who discovered penicillin?',options:['Alexander Fleming','Louis Pasteur','Robert Koch','Edward Jenner'],answer:0},
+{id:'gk-e27',subject:'gk',diff:'easy',q:'How many players are on a football (soccer) team on the pitch?',options:['11','10','12','9'],answer:0},
+{id:'gk-e28',subject:'gk',diff:'easy',q:'Which is the hardest natural substance?',options:['Diamond','Gold','Iron','Quartz'],answer:0},
+{id:'gk-e29',subject:'gk',diff:'easy',q:'The Earth takes how long to orbit the Sun?',options:['365 days','30 days','24 hours','180 days'],answer:0},
+{id:'gk-e30',subject:'gk',diff:'easy',q:'The currency of the United Kingdom is:',options:['Pound sterling','Euro','Dollar','Franc'],answer:0},
+
+/* ══════════════════════ GK — HARD (30) ══════════════════════ */
+{id:'gk-h1',subject:'gk',diff:'hard',q:'In Mendel\'s experiments, when he crossed a pure tall pea plant (TT) with a pure short pea plant (tt), the F1 generation was:',options:['all tall','all short','50% tall, 50% short','75% tall, 25% short'],answer:0},
+{id:'gk-h2',subject:'gk',diff:'hard',q:'Who proposed the theory of evolution by natural selection?',options:['Charles Darwin','Gregor Mendel','Louis Pasteur','Carl Linnaeus'],answer:0},
+{id:'gk-h3',subject:'gk',diff:'hard',q:'The arms of government in Nigeria are:',options:['Executive, Legislature, Judiciary','Federal, State, Local','President, Senate, House','APC, PDP, LP'],answer:0},
+{id:'gk-h4',subject:'gk',diff:'hard',q:'ECOWAS was established in which year?',options:['1975','1963','1960','1991'],answer:0},
+{id:'gk-h5',subject:'gk',diff:'hard',q:'The process by which plants make food using sunlight is called:',options:['photosynthesis','respiration','transpiration','digestion'],answer:0},
+{id:'gk-h6',subject:'gk',diff:'hard',q:'Which of the following is NOT a renewable energy source?',options:['Natural gas','Solar','Wind','Hydro'],answer:0},
+{id:'gk-h7',subject:'gk',diff:'hard',q:'The Nobel Prize is awarded in how many categories?',options:['6','5','7','4'],answer:0},
+{id:'gk-h8',subject:'gk',diff:'hard',q:'Which African country was never colonised?',options:['Ethiopia','Ghana','Kenya','Nigeria'],answer:0},
+{id:'gk-h9',subject:'gk',diff:'hard',q:'The theory of relativity was proposed by:',options:['Albert Einstein','Isaac Newton','Galileo Galilei','Stephen Hawking'],answer:0},
+{id:'gk-h10',subject:'gk',diff:'hard',q:'The double-helix structure of DNA was discovered by:',options:['Watson and Crick','Mendel','Darwin','Pasteur'],answer:0},
+{id:'gk-h11',subject:'gk',diff:'hard',q:'The process of cell division that produces gametes is:',options:['meiosis','mitosis','binary fission','budding'],answer:0},
+{id:'gk-h12',subject:'gk',diff:'hard',q:'Which organisation is responsible for global public health?',options:['WHO','UNESCO','UNICEF','FAO'],answer:0},
+{id:'gk-h13',subject:'gk',diff:'hard',q:'The Great Wall of China was primarily built to:',options:['defend against invasions','attract tourists','mark territory','serve as a trade route'],answer:0},
+{id:'gk-h14',subject:'gk',diff:'hard',q:'The chemical formula for table salt is:',options:['NaCl','KCl','CaCO₃','NaHCO₃'],answer:0},
+{id:'gk-h15',subject:'gk',diff:'hard',q:'Which Nigerian state is known as the "Centre of Excellence"?',options:['Lagos','Kano','Rivers','Ogun'],answer:0},
+{id:'gk-h16',subject:'gk',diff:'hard',q:'The concept of "checks and balances" is most closely associated with:',options:['Montesquieu','Rousseau','Hobbes','Locke'],answer:0},
+{id:'gk-h17',subject:'gk',diff:'hard',q:'The periodic table was first organised by:',options:['Dmitri Mendeleev','John Dalton','Antoine Lavoisier','Marie Curie'],answer:0},
+{id:'gk-h18',subject:'gk',diff:'hard',q:'Which SDG aims to "end poverty in all its forms everywhere"?',options:['SDG 1','SDG 2','SDG 3','SDG 4'],answer:0},
+{id:'gk-h19',subject:'gk',diff:'hard',q:'The largest desert in the world is:',options:['Antarctic Desert','Sahara','Gobi','Kalahari'],answer:0},
+{id:'gk-h20',subject:'gk',diff:'hard',q:'Which part of the human brain controls balance and coordination?',options:['Cerebellum','Cerebrum','Medulla','Hypothalamus'],answer:0},
+{id:'gk-h21',subject:'gk',diff:'hard',q:'The Berlin Wall fell in:',options:['1989','1991','1985','1979'],answer:0},
+{id:'gk-h22',subject:'gk',diff:'hard',q:'Nigeria gained independence in:',options:['1960','1963','1957','1965'],answer:0},
+{id:'gk-h23',subject:'gk',diff:'hard',q:'Which is the largest internal organ in the human body?',options:['Liver','Heart','Kidney','Lungs'],answer:0},
+{id:'gk-h24',subject:'gk',diff:'hard',q:'The speed of sound is fastest in:',options:['Solids','Gases','Liquids','Vacuum'],answer:0},
+{id:'gk-h25',subject:'gk',diff:'hard',q:'The AU (African Union) was established in:',options:['2002','1963','1991','2000'],answer:0},
+{id:'gk-h26',subject:'gk',diff:'hard',q:'DNA stands for:',options:['Deoxyribonucleic acid','Diribonucleic acid','Deoxyribose nucleotide','Dextro nucleic acid'],answer:0},
+{id:'gk-h27',subject:'gk',diff:'hard',q:'Which Nigerian was the first to win a Nobel Prize?',options:['Wole Soyinka','Chinua Achebe','Nelson Mandela','Kofi Annan'],answer:0},
+{id:'gk-h28',subject:'gk',diff:'hard',q:'The most abundant metal in Earth\'s crust is:',options:['Aluminium','Iron','Calcium','Sodium'],answer:0},
+{id:'gk-h29',subject:'gk',diff:'hard',q:'Mount Kilimanjaro is located in:',options:['Tanzania','Kenya','Uganda','Ethiopia'],answer:0},
+{id:'gk-h30',subject:'gk',diff:'hard',q:'The theory of universal gravitation was formulated by:',options:['Isaac Newton','Albert Einstein','Galileo','Kepler'],answer:0},
+
+/* ══════════════════════ GK — DIFFICULT (30) ══════════════════════ */
+{id:'gk-d1',subject:'gk',diff:'difficult',q:'In a cross between two heterozygous tall pea plants (Tt × Tt), what is the phenotypic ratio of the offspring?',options:['3:1','1:1','9:3:3:1','2:1'],answer:0},
+{id:'gk-d2',subject:'gk',diff:'difficult',q:'Which Sustainable Development Goal focuses on "Quality Education"?',options:['SDG 4','SDG 3','SDG 5','SDG 8'],answer:0},
+{id:'gk-d3',subject:'gk',diff:'difficult',q:'The "Bretton Woods" institutions are:',options:['IMF and World Bank','UN and AU','WTO and WHO','NATO and EU'],answer:0},
+{id:'gk-d4',subject:'gk',diff:'difficult',q:'The structure of DNA is best described as:',options:['double helix','single helix','triple helix','alpha helix'],answer:0},
+{id:'gk-d5',subject:'gk',diff:'difficult',q:'Nigeria\'s 1999 Constitution established which system of government?',options:['presidential','parliamentary','unitary','confederal'],answer:0},
+{id:'gk-d6',subject:'gk',diff:'difficult',q:'In economics, "opportunity cost" refers to:',options:['the value of the next best alternative forgone','the cost of buying opportunities','the total cost of production','the cost of marketing'],answer:0},
+{id:'gk-d7',subject:'gk',diff:'difficult',q:'The speed of light in a vacuum is approximately:',options:['3 × 10⁸ m/s','3 × 10⁶ m/s','3 × 10¹⁰ m/s','3 × 10⁵ m/s'],answer:0},
+{id:'gk-d8',subject:'gk',diff:'difficult',q:'Which gas is most abundant in Earth\'s atmosphere?',options:['Nitrogen','Oxygen','Carbon dioxide','Argon'],answer:0},
+{id:'gk-d9',subject:'gk',diff:'difficult',q:'The French Revolution began in:',options:['1789','1776','1799','1804'],answer:0},
+{id:'gk-d10',subject:'gk',diff:'difficult',q:'The "Green Revolution" refers to:',options:['a sharp increase in agricultural productivity','environmental activism','renewable energy','forest conservation'],answer:0},
+{id:'gk-d11',subject:'gk',diff:'difficult',q:'The Human Genome Project was completed in:',options:['2003','1990','2010','1995'],answer:0},
+{id:'gk-d12',subject:'gk',diff:'difficult',q:'Which of these is a non-renewable resource?',options:['Coal','Solar','Wind','Biomass'],answer:0},
+{id:'gk-d13',subject:'gk',diff:'difficult',q:'Montesquieu\'s theory of separation of powers most directly influenced which document?',options:['The US Constitution','The Bible','Magna Carta','The Nigerian Constitution only'],answer:0},
+{id:'gk-d14',subject:'gk',diff:'difficult',q:'The pH of a neutral solution at 25°C is:',options:['7','0','14','1'],answer:0},
+{id:'gk-d15',subject:'gk',diff:'difficult',q:'Which blood group is called the "universal donor"?',options:['O negative','AB positive','A positive','B negative'],answer:0},
+{id:'gk-d16',subject:'gk',diff:'difficult',q:'The Industrial Revolution began in:',options:['Britain','France','Germany','USA'],answer:0},
+{id:'gk-d17',subject:'gk',diff:'difficult',q:'Which organ produces insulin?',options:['Pancreas','Liver','Kidney','Stomach'],answer:0},
+{id:'gk-d18',subject:'gk',diff:'difficult',q:'In genetics, an organism with two identical alleles is said to be:',options:['homozygous','heterozygous','phenotypic','dominant'],answer:0},
+{id:'gk-d19',subject:'gk',diff:'difficult',q:'The Universal Declaration of Human Rights was adopted in:',options:['1948','1945','1950','1960'],answer:0},
+{id:'gk-d20',subject:'gk',diff:'difficult',q:'Which sea separates Europe from Africa?',options:['Mediterranean Sea','Red Sea','Black Sea','Baltic Sea'],answer:0},
+{id:'gk-d21',subject:'gk',diff:'difficult',q:'The term "inflation" in economics refers to:',options:['a sustained rise in the general price level','a rise in unemployment','a fall in GDP','an increase in taxes'],answer:0},
+{id:'gk-d22',subject:'gk',diff:'difficult',q:'Which country has the largest population in Africa?',options:['Nigeria','Egypt','Ethiopia','South Africa'],answer:0},
+{id:'gk-d23',subject:'gk',diff:'difficult',q:'The First World War began in:',options:['1914','1918','1939','1900'],answer:0},
+{id:'gk-d24',subject:'gk',diff:'difficult',q:'The layer of the atmosphere closest to Earth is:',options:['Troposphere','Stratosphere','Mesosphere','Thermosphere'],answer:0},
+{id:'gk-d25',subject:'gk',diff:'difficult',q:'Which is the longest river in the world?',options:['Nile','Amazon','Yangtze','Mississippi'],answer:0},
+{id:'gk-d26',subject:'gk',diff:'difficult',q:'The African Union headquarters is located in:',options:['Addis Ababa','Nairobi','Cairo','Abuja'],answer:0},
+{id:'gk-d27',subject:'gk',diff:'difficult',q:'Ozone layer depletion is primarily caused by:',options:['chlorofluorocarbons (CFCs)','carbon dioxide','methane','sulphur dioxide'],answer:0},
+{id:'gk-d28',subject:'gk',diff:'difficult',q:'Which of these is NOT a Mendelian law?',options:['Law of gravitational inheritance','Law of segregation','Law of independent assortment','Law of dominance'],answer:0},
+{id:'gk-d29',subject:'gk',diff:'difficult',q:'The term "GDP" stands for:',options:['Gross Domestic Product','General Domestic Price','Gross Development Plan','Government Domestic Product'],answer:0},
+{id:'gk-d30',subject:'gk',diff:'difficult',q:'The Nigerian Civil War (Biafran War) ended in:',options:['1970','1967','1972','1969'],answer:0}
+,{id:'gk-d30',subject:'gk',diff:'difficult',q:'The Nigerian Civil War (Biafran War) ended in:',options:['1970','1967','1972','1969'],answer:0},
+
+/* ═══════════════ NEW: MATHS EASY (IGCSE Core) ═══════════════ */
+{id:'ma-e31',subject:'math',diff:'easy',q:'Solve: 3(x − 2) = 2x + 5.',options:['11','9','13','7'],answer:0},
+{id:'ma-e32',subject:'math',diff:'easy',q:'Simplify: (2x²y)³.',options:['8x⁶y³','6x⁶y³','8x⁵y³','2x⁶y³'],answer:0},
+{id:'ma-e33',subject:'math',diff:'easy',q:'Factorise: x² − 5x + 6.',options:['(x − 2)(x − 3)','(x + 2)(x + 3)','(x − 1)(x − 6)','(x − 5)(x − 1)'],answer:0},
+{id:'ma-e34',subject:'math',diff:'easy',q:'If y varies inversely as x, and y = 8 when x = 3, what is y when x = 6?',options:['4','16','2','12'],answer:0},
+{id:'ma-e35',subject:'math',diff:'easy',q:'Find the gradient of the line through (2, 3) and (6, 11).',options:['2','1/2','4','3'],answer:0},
+{id:'ma-e36',subject:'math',diff:'easy',q:'What is the sum of the interior angles of an octagon?',options:['1080°','900°','720°','1440°'],answer:0},
+{id:'ma-e37',subject:'math',diff:'easy',q:'Express the recurring decimal 0.444... as a fraction in lowest terms.',options:['4/9','2/5','4/10','44/100'],answer:0},
+{id:'ma-e38',subject:'math',diff:'easy',q:'If 3ˣ = 81, find x.',options:['4','3','5','27'],answer:0},
+{id:'ma-e39',subject:'math',diff:'easy',q:'A car uses 8 litres per 100 km. How many litres for 350 km?',options:['28','24','32','30'],answer:0},
+{id:'ma-e40',subject:'math',diff:'easy',q:'If a : b = 2 : 3 and b : c = 4 : 5, find a : c.',options:['8 : 15','2 : 5','6 : 12','3 : 4'],answer:0},
+{id:'ma-e41',subject:'math',diff:'easy',q:'Simplify: (3/4) ÷ (9/16).',options:['4/3','3/4','27/64','2/3'],answer:0},
+{id:'ma-e42',subject:'math',diff:'easy',q:'Find the mean of 12, 15, 18, 21, 24.',options:['18','15','20','16'],answer:0},
+{id:'ma-e43',subject:'math',diff:'easy',q:'Simplify: √50 − √18.',options:['2√2','8√2','4√2','√32'],answer:0},
+{id:'ma-e44',subject:'math',diff:'easy',q:'What is 15% of 15% of 2,000?',options:['45','30','60','90'],answer:0},
+{id:'ma-e45',subject:'math',diff:'easy',q:'A polygon has an exterior angle of 30°. How many sides does it have?',options:['12','10','8','15'],answer:0},
+
+/* ═══════════════ NEW: MATHS HARD (SAT L1 / IGCSE Extended) ═══════════════ */
+{id:'ma-h31',subject:'math',diff:'hard',q:'If log₂(x) + log₂(x − 2) = 3, what is x?',options:['4','5','3','6'],answer:0},
+{id:'ma-h32',subject:'math',diff:'hard',q:'If x² + y² = 25 and x + y = 7, find xy.',options:['12','10','14','9'],answer:0},
+{id:'ma-h33',subject:'math',diff:'hard',q:'Solve: 2x² − 5x − 3 = 0.',options:['x = 3 or −1/2','x = 1 or 3','x = −1 or 3','x = 2 or −1/3'],answer:0},
+{id:'ma-h34',subject:'math',diff:'hard',q:'Two fair dice are rolled. What is the probability that the sum exceeds 9?',options:['1/6','1/9','5/36','1/12'],answer:0},
+{id:'ma-h35',subject:'math',diff:'hard',q:'A GP has 3rd term 12 and 6th term 96. What is the common ratio?',options:['2','3','4','6'],answer:0},
+{id:'ma-h36',subject:'math',diff:'hard',q:'If θ is acute and tan θ = 3/4, find sin θ + cos θ.',options:['7/5','1','3/5','4/5'],answer:0},
+{id:'ma-h37',subject:'math',diff:'hard',q:'A right cylinder has radius 7 cm and height 10 cm. Find its curved surface area (π = 22/7).',options:['440 cm²','220 cm²','308 cm²','616 cm²'],answer:0},
+{id:'ma-h38',subject:'math',diff:'hard',q:'The equation x² − kx + 16 = 0 has equal roots. Find the positive value of k.',options:['8','4','16','2'],answer:0},
+{id:'ma-h39',subject:'math',diff:'hard',q:'In a class of 40 students, 25 like Maths, 20 like English, and 10 like both. How many like neither?',options:['5','10','15','0'],answer:0},
+{id:'ma-h40',subject:'math',diff:'hard',q:'Solve: 3x + 2y = 16 and 2x − y = 6. Find x + y.',options:['6','7','5','8'],answer:0},
+{id:'ma-h41',subject:'math',diff:'hard',q:'Simplify: (√3 + 1)/(√3 − 1).',options:['2 + √3','2 − √3','√3','1 + √3'],answer:0},
+{id:'ma-h42',subject:'math',diff:'hard',q:'What is the 20th term of the AP 5, 9, 13, 17, ...?',options:['81','77','85','79'],answer:0},
+{id:'ma-h43',subject:'math',diff:'hard',q:'A fair coin is flipped 4 times. Find P(exactly 2 heads).',options:['3/8','1/4','1/2','5/16'],answer:0},
+{id:'ma-h44',subject:'math',diff:'hard',q:'If f(x) = x² − 3x + 2, find f(f(1)).',options:['2','0','1','4'],answer:0},
+{id:'ma-h45',subject:'math',diff:'hard',q:'What number must be added to x² + 8x to make it a perfect square?',options:['16','8','4','64'],answer:0},
+
+/* ═══════════════ NEW: MATHS DIFFICULT (SAT L2 / Further Maths) ═══════════════ */
+{id:'ma-d31',subject:'math',diff:'difficult',q:'Truck P travels at 54 km/h and passes a point at 10:30 am. Truck Q travels at 90 km/h and passes the same point at 11:00 am. At what time will Q overtake P?',options:['11:45 am','12:00 pm','11:30 am','12:15 pm'],answer:0},
+{id:'ma-d32',subject:'math',diff:'difficult',q:'If i² = −1, find the real part of (2 + 3i)(1 − 2i).',options:['8','−4','6','2'],answer:0},
+{id:'ma-d33',subject:'math',diff:'difficult',q:'An infinite GP has first term 8 and common ratio 1/2. What is its sum to infinity?',options:['16','12','24','8'],answer:0},
+{id:'ma-d34',subject:'math',diff:'difficult',q:'If α and β are the roots of 2x² − 7x + 3 = 0, find 1/α + 1/β.',options:['7/3','3/7','7/2','2/7'],answer:0},
+{id:'ma-d35',subject:'math',diff:'difficult',q:'Solve: 3^(2x) − 4(3ˣ) + 3 = 0. Find the sum of the values of x.',options:['1','2','0','3'],answer:0},
+{id:'ma-d36',subject:'math',diff:'difficult',q:'If tan A = 3/4 and A is acute, find sin 2A.',options:['24/25','7/25','12/25','3/5'],answer:0},
+{id:'ma-d37',subject:'math',diff:'difficult',q:'In how many distinct ways can the letters of the word MISSISSIPPI be arranged?',options:['34,650','11,880','1,663,200','42,000'],answer:0},
+{id:'ma-d38',subject:'math',diff:'difficult',q:'Solve the inequality: x² − 5x + 6 < 0.',options:['2 < x < 3','x < 2 or x > 3','−3 < x < −2','x < −3 or x > −2'],answer:0},
+{id:'ma-d39',subject:'math',diff:'difficult',q:'If log₄(x) = 3/2, find x.',options:['8','6','4','16'],answer:0},
+{id:'ma-d40',subject:'math',diff:'difficult',q:'Find the perpendicular distance from point (3, 4) to the line 3x + 4y = 10.',options:['3','2','5','1'],answer:0},
+{id:'ma-d41',subject:'math',diff:'difficult',q:'If A = [[2, 1], [3, 4]], find det(A).',options:['5','8','11','−5'],answer:0},
+{id:'ma-d42',subject:'math',diff:'difficult',q:'The 4th term of an AP is 15 and the 9th term is 35. Find the sum of the first 20 terms.',options:['820','800','760','900'],answer:0},
+{id:'ma-d43',subject:'math',diff:'difficult',q:'Solve: √(x + 5) + √(x − 3) = 4.',options:['4','5','3','6'],answer:0},
+{id:'ma-d44',subject:'math',diff:'difficult',q:'A bag has 3 red and 4 white balls. Two balls are drawn without replacement. P(different colours)?',options:['4/7','3/7','1/2','2/7'],answer:0},
+{id:'ma-d45',subject:'math',diff:'difficult',q:'Find the coefficient of x³ in the expansion of (2 + x)⁵.',options:['40','80','20','10'],answer:0},
+{id:'ma-d46',subject:'math',diff:'difficult',q:'If y = (3x + 1)/(x − 2), find dy/dx.',options:['−7/(x − 2)²','7/(x − 2)²','3/(x − 2)²','−1/(x − 2)²'],answer:0},
+{id:'ma-d47',subject:'math',diff:'difficult',q:'Solve for θ in 0° ≤ θ ≤ 90°: cos²θ − sin²θ = 1/2.',options:['30°','45°','60°','15°'],answer:0},
+{id:'ma-d48',subject:'math',diff:'difficult',q:'Evaluate the definite integral ∫₀² (3x² + 2x) dx.',options:['12','10','14','8'],answer:0},
+{id:'ma-d49',subject:'math',diff:'difficult',q:'If α and β are roots of x² − 3x − 4 = 0, find α² + β².',options:['17','9','25','7'],answer:0},
+{id:'ma-d50',subject:'math',diff:'difficult',q:'A right triangle has legs 5 and 12. Find sin of the largest acute angle.',options:['12/13','5/13','5/12','13/12'],answer:0},
+
+/* ═══════════════ NEW: ENGLISH EASY (SAT Medium / WAEC) ═══════════════ */
+{id:'en-e31',subject:'english',diff:'easy',q:'The critic\'s review was ______: it praised the film\'s visuals while condemning its plot.',options:['ambivalent','unequivocal','biased','superficial'],answer:0},
+{id:'en-e32',subject:'english',diff:'easy',q:'Despite the ______ weather conditions, the expedition succeeded.',options:['adverse','averse','advertent','advisory'],answer:0},
+{id:'en-e33',subject:'english',diff:'easy',q:'Choose the grammatically correct sentence.',options:['Between you and me, this is wrong.','Between you and I, this is wrong.','Between yourself and I, this is wrong.','Between you and myself, this is wrong.'],answer:0},
+{id:'en-e34',subject:'english',diff:'easy',q:'Choose the sentence with correct punctuation.',options:['My favourite foods are rice, beans, and yam.','My favourite foods are: rice, beans, and yam.','My favourite foods are rice; beans; and yam.','My favourite foods, are rice, beans and yam.'],answer:0},
+{id:'en-e35',subject:'english',diff:'easy',q:'The manager\'s ______ approach to scheduling ensured nothing was overlooked.',options:['fastidious','facetious','fatalistic','fatal'],answer:0},
+{id:'en-e36',subject:'english',diff:'easy',q:'Choose the correctly spelt word.',options:['maintenance','maintainance','maintenence','maintainence'],answer:0},
+{id:'en-e37',subject:'english',diff:'easy',q:'He spoke ______ about his achievements, never boasting.',options:['modestly','modest','modesty','modesting'],answer:0},
+{id:'en-e38',subject:'english',diff:'easy',q:'The team was ______ after losing the final match.',options:['despondent','despondency','despondently','desponded'],answer:0},
+{id:'en-e39',subject:'english',diff:'easy',q:'The doctor gave a ______ of the patient\'s likely recovery.',options:['prognosis','diagnosis','analysis','scrutiny'],answer:0},
+{id:'en-e40',subject:'english',diff:'easy',q:'The word "meticulous" most nearly means:',options:['extremely careful','careless','suspicious','generous'],answer:0},
+
+/* ═══════════════ NEW: ENGLISH HARD (SAT Hard) ═══════════════ */
+{id:'en-h31',subject:'english',diff:'hard',q:'A student wants to strengthen the argument that remote work has hurt city economies. Which evidence best supports this claim?',options:['Office vacancy rates in San Francisco rose from 5% to 30% between 2019 and 2023.','Many workers enjoy remote work.','Remote work requires stable internet.','Most tech companies are in San Francisco.'],answer:0},
+{id:'en-h32',subject:'english',diff:'hard',q:'"The senator\'s speech was remarkable not for what it said, but for what it carefully avoided saying." This sentence is best described as:',options:['ironic praise','blunt criticism','neutral observation','a rhetorical question'],answer:0},
+{id:'en-h33',subject:'english',diff:'hard',q:'The novelist\'s prose, while admired for its lyricism, has been criticised as ______, prioritising beauty over substance.',options:['superficial','ornamental','decorative','elegant'],answer:0},
+{id:'en-h34',subject:'english',diff:'hard',q:'The politician\'s promises, however ______ they sounded on the campaign trail, proved impossible to implement.',options:['plausible','ridiculous','modest','quiet'],answer:0},
+{id:'en-h35',subject:'english',diff:'hard',q:'In the sentence "The scientist\'s findings were met with scepticism", the word "scepticism" most nearly means:',options:['doubt about the truth','enthusiastic acceptance','complete indifference','anger'],answer:0},
+{id:'en-h36',subject:'english',diff:'hard',q:'Which sentence best illustrates "irony"?',options:['The fire station burned down.','The chef cooked a delicious meal.','The teacher taught the students.','The dog barked at the mailman.'],answer:0},
+{id:'en-h37',subject:'english',diff:'hard',q:'"While the policy appeared benign, its long-term effects proved catastrophic." The word "benign" most nearly means:',options:['harmless','harmful','beneficial','surprising'],answer:0},
+{id:'en-h38',subject:'english',diff:'hard',q:'Choose the grammatically correct sentence.',options:['Neither the manager nor the employees were available.','Neither the manager nor the employees was available.','Neither the manager or the employees were available.','Neither the manager nor the employees is available.'],answer:0},
+{id:'en-h39',subject:'english',diff:'hard',passage:'PH5',q:'The passage is primarily concerned with:',options:['the transformation of journalism and its uncertain future','the history of newspapers before the internet','the role of advertising in the twentieth century','why editors are no longer needed'],answer:0},
+{id:'en-h40',subject:'english',diff:'hard',passage:'PH5',q:'The phrase "the collapse of shared factual ground" suggests the author is concerned about:',options:['a decline in common sources of truth','the physical collapse of printing presses','the growth of podcasts','government censorship'],answer:0},
+{id:'en-h41',subject:'english',diff:'hard',passage:'PH5',q:'The author\'s tone in the final sentence is best described as:',options:['uncertain but serious','openly celebratory','bitterly sarcastic','entirely neutral'],answer:0},
+{id:'en-h42',subject:'english',diff:'hard',q:'The expression "to bury the hatchet" means:',options:['to make peace','to hide a weapon','to dig a hole','to plan revenge'],answer:0},
+{id:'en-h43',subject:'english',diff:'hard',q:'The manager\'s proposal was a ______ — it promised a solution to every problem but delivered nothing.',options:['chimera','panacea','nostrum','miracle'],answer:0},
+{id:'en-h44',subject:'english',diff:'hard',q:'Identify the sentence with correct use of "who" versus "whom".',options:['Whom did you give the book to?','Who did you give the book to?','Whom is going to the party?','Who shall I say is calling him?'],answer:0},
+{id:'en-h45',subject:'english',diff:'hard',q:'"His connection to the case was tenuous at best — a single phone call three years prior." The word "tenuous" most nearly means:',options:['weak and insubstantial','strong','recent','suspicious'],answer:0},
+
+/* ═══════════════ NEW: ENGLISH DIFFICULT (SAT Advanced) ═══════════════ */
+{id:'en-d31',subject:'english',diff:'difficult',q:'"Though Mr. Iro is our new chairman, he views other members with a jaundiced eye." This means he views them with:',options:['suspicion and envy','respect and admiration','indifference','warmth'],answer:0},
+{id:'en-d32',subject:'english',diff:'difficult',q:'The auditor\'s report was so ______ that even the most senior officials could not decipher its conclusions.',options:['abstruse','pellucid','trenchant','magnanimous'],answer:0},
+{id:'en-d33',subject:'english',diff:'difficult',q:'The theory was not so much disproven as ______ — its claims were quietly weakened by accumulated counter-evidence.',options:['attenuated','vindicated','corroborated','entrenched'],answer:0},
+{id:'en-d34',subject:'english',diff:'difficult',q:'His arguments, though ______, dissolved under careful scrutiny.',options:['specious','cogent','tenable','robust'],answer:0},
+{id:'en-d35',subject:'english',diff:'difficult',q:'A report claims: "The new policy reduced poverty because welfare enrollment doubled." Which fact, if true, most undermines this reasoning?',options:['Poverty also fell sharply in neighbouring countries without similar policies.','The policy was popular with voters.','Welfare enrollment often rises during recessions.','Enrollment measures only formal employment.'],answer:0},
+{id:'en-d36',subject:'english',diff:'difficult',passage:'PD5',q:'The passage\'s primary purpose is to:',options:['contrast two concepts of liberty and note unresolved tension','defend Berlin\'s view against critics','argue for unlimited state power','define freedom in legal terms'],answer:0},
+{id:'en-d37',subject:'english',diff:'difficult',passage:'PD5',q:'Berlin\'s warning about positive liberty can best be summarised as:',options:['the state may coerce citizens in the name of their "real" will','freedom always requires government action','negative liberty is illusory','welfare undermines democracy'],answer:0},
+{id:'en-d38',subject:'english',diff:'difficult',passage:'PD5',q:'The author presents the critics\' response in order to:',options:['show the debate remains live rather than settled','refute Berlin conclusively','support unlimited state intervention','dismiss the concept of liberty'],answer:0},
+{id:'en-d39',subject:'english',diff:'difficult',q:'"The historian\'s prose, at once lapidary and luminous, renders the past almost tangible." The word "lapidary" most nearly means:',options:['polished and precise','lengthy','obscure','emotional'],answer:0},
+{id:'en-d40',subject:'english',diff:'difficult',q:'The candidate\'s speech was less a policy address than a ______ of vague aspirations.',options:['litany','compendium','paean','panegyric'],answer:0},
+{id:'en-d41',subject:'english',diff:'difficult',q:'"Economic growth figures, however encouraging on paper, tell us little about the lived experience of those at the margins." The author\'s attitude is best described as:',options:['skeptical of abstract indicators','hostile to economics','supportive of government policy','indifferent to poverty'],answer:0},
+{id:'en-d42',subject:'english',diff:'difficult',q:'In the sentence "He made only oblique references to the scandal", the word "oblique" most nearly means:',options:['indirect','direct','angry','frequent'],answer:0},
+{id:'en-d43',subject:'english',diff:'difficult',q:'The treatise was so ______ that even specialists in the field found it impenetrable.',options:['recondite','lucid','accessible','superficial'],answer:0},
+{id:'en-d44',subject:'english',diff:'difficult',q:'In academic writing, "prima facie" means:',options:['at first glance','obviously false','by definition','in conclusion'],answer:0},
+{id:'en-d45',subject:'english',diff:'difficult',q:'The critic\'s ______ of the novel — damning yet precise — left the author speechless.',options:['excoriation','encomium','panegyric','apology'],answer:0},
+
+/* ═══════════════ NEW: GK EASY ═══════════════ */
+{id:'gk-e31',subject:'gk',diff:'easy',q:'The largest moon in the solar system is:',options:['Ganymede','Titan','Luna','Europa'],answer:0},
+{id:'gk-e32',subject:'gk',diff:'easy',q:'Who was Nigeria\'s first Prime Minister?',options:['Tafawa Balewa','Nnamdi Azikiwe','Obafemi Awolowo','Ahmadu Bello'],answer:0},
+{id:'gk-e33',subject:'gk',diff:'easy',q:'How many moons does Mars have?',options:['2','1','0','4'],answer:0},
+{id:'gk-e34',subject:'gk',diff:'easy',q:'The functional unit of the kidney is the:',options:['nephron','neuron','alveolus','hepatocyte'],answer:0},
+{id:'gk-e35',subject:'gk',diff:'easy',q:'The longest river in Asia is:',options:['Yangtze','Ganges','Mekong','Yellow'],answer:0},
+{id:'gk-e36',subject:'gk',diff:'easy',q:'The SI unit of force is the:',options:['newton','joule','watt','pascal'],answer:0},
+{id:'gk-e37',subject:'gk',diff:'easy',q:'The Nigerian Coat of Arms features:',options:['two horses and an eagle','a lion and an eagle','an elephant and a lion','two eagles and a horse'],answer:0},
+{id:'gk-e38',subject:'gk',diff:'easy',q:'Which vitamin deficiency causes scurvy?',options:['Vitamin C','Vitamin A','Vitamin B12','Vitamin D'],answer:0},
+{id:'gk-e39',subject:'gk',diff:'easy',q:'The largest lake in Africa is:',options:['Lake Victoria','Lake Chad','Lake Tanganyika','Lake Malawi'],answer:0},
+{id:'gk-e40',subject:'gk',diff:'easy',q:'The smallest state in Nigeria by land area is:',options:['Lagos','Anambra','Bayelsa','Imo'],answer:0},
+
+/* ═══════════════ NEW: GK HARD ═══════════════ */
+{id:'gk-h31',subject:'gk',diff:'hard',q:'In a cross between two heterozygous tall pea plants (Tt × Tt), what proportion of offspring will be short?',options:['25%','50%','75%','0%'],answer:0},
+{id:'gk-h32',subject:'gk',diff:'hard',q:'Which Nigerian constitution first introduced the presidential system?',options:['1979','1963','1989','1999'],answer:0},
+{id:'gk-h33',subject:'gk',diff:'hard',q:'Sustainable Development Goal 13 is:',options:['Climate Action','Life Below Water','Zero Hunger','Clean Water and Sanitation'],answer:0},
+{id:'gk-h34',subject:'gk',diff:'hard',q:'As of 2024, the Chairperson of the African Union Commission is:',options:['Moussa Faki Mahamat','Nkosazana Dlamini-Zuma','Jean Ping','Alpha Oumar Konaré'],answer:0},
+{id:'gk-h35',subject:'gk',diff:'hard',q:'X-linked recessive disorders are more common in males because:',options:['males have only one X chromosome, so one recessive allele is sufficient','males have two X chromosomes','females cannot carry the disorder','the Y chromosome amplifies the disorder'],answer:0},
+{id:'gk-h36',subject:'gk',diff:'hard',q:'The Bretton Woods Conference (1944) led to the creation of:',options:['the IMF and World Bank','NATO and the Warsaw Pact','the UN and UNESCO','OPEC and ECOWAS'],answer:0},
+{id:'gk-h37',subject:'gk',diff:'hard',q:'The Nigerian Senate has how many members?',options:['109','360','100','120'],answer:0},
+{id:'gk-h38',subject:'gk',diff:'hard',q:'The process of meiosis produces:',options:['four genetically distinct haploid cells','two identical diploid cells','two haploid cells','four identical diploid cells'],answer:0},
+{id:'gk-h39',subject:'gk',diff:'hard',q:'The Kyoto Protocol is an international treaty concerned with:',options:['climate change','trade','human rights','nuclear weapons'],answer:0},
+{id:'gk-h40',subject:'gk',diff:'hard',q:'The Berlin Conference of 1884–85 was primarily concerned with:',options:['partitioning Africa among European powers','ending slavery','forming the United Nations','German unification'],answer:0},
+{id:'gk-h41',subject:'gk',diff:'hard',q:'In Nigeria, judicial review is the power of the courts to:',options:['review and invalidate unconstitutional actions','appoint ministers','control the military','levy taxes'],answer:0},
+{id:'gk-h42',subject:'gk',diff:'hard',q:'The genetic term "codominance" describes:',options:['both alleles being fully expressed in the phenotype','one allele masking another','blending of traits','a trait skipping a generation'],answer:0},
+{id:'gk-h43',subject:'gk',diff:'hard',q:'The highest court in Nigeria is the:',options:['Supreme Court','Court of Appeal','Federal High Court','High Court'],answer:0},
+{id:'gk-h44',subject:'gk',diff:'hard',q:'The 2015 successor to the Kyoto Protocol is the:',options:['Paris Agreement','Copenhagen Accord','Montreal Protocol','Rio Declaration'],answer:0},
+{id:'gk-h45',subject:'gk',diff:'hard',q:'In economics, the law of demand states that, all else equal:',options:['price and quantity demanded move in opposite directions','price and quantity demanded move together','demand is always constant','supply determines demand'],answer:0},
+
+/* ═══════════════ NEW: GK DIFFICULT ═══════════════ */
+{id:'gk-d31',subject:'gk',diff:'difficult',q:'In a dihybrid cross between two heterozygous parents (RrYy × RrYy), what proportion of offspring will show both recessive traits?',options:['1/16','3/16','9/16','1/4'],answer:0},
+{id:'gk-d32',subject:'gk',diff:'difficult',q:'The International Court of Justice is located in:',options:['The Hague','Geneva','New York','Vienna'],answer:0},
+{id:'gk-d33',subject:'gk',diff:'difficult',q:'The "tragedy of the commons" describes:',options:['individual self-interest depleting a shared resource','a classical play about governance','government mismanagement of public funds','the collapse of trade agreements'],answer:0},
+{id:'gk-d34',subject:'gk',diff:'difficult',q:'A woman who is a carrier for haemophilia (XᴴXʰ) marries an unaffected man (XᴴY). What is the probability that a son will have haemophilia?',options:['50%','0%','25%','100%'],answer:0},
+{id:'gk-d35',subject:'gk',diff:'difficult',q:'The "resource curse" refers to:',options:['natural-resource wealth leading to poor economic performance','depletion of natural resources causing conflict','environmental damage from mining','foreign companies exploiting local workers'],answer:0},
+{id:'gk-d36',subject:'gk',diff:'difficult',q:'Which European country was first to grant women the national right to vote?',options:['Finland','United Kingdom','France','Germany'],answer:0},
+{id:'gk-d37',subject:'gk',diff:'difficult',q:'The political philosopher who developed the "veil of ignorance" thought experiment was:',options:['John Rawls','Robert Nozick','Karl Marx','John Stuart Mill'],answer:0},
+{id:'gk-d38',subject:'gk',diff:'difficult',q:'A child with blood type O can only have parents who:',options:['both carry an O allele (or are both type O)','are both type AB','include at least one parent with type O','are both type A'],answer:0},
+{id:'gk-d39',subject:'gk',diff:'difficult',q:'The Nuremberg Trials were held to:',options:['prosecute Nazi war criminals after WWII','negotiate peace after WWI','establish the United Nations','partition Germany'],answer:0},
+{id:'gk-d40',subject:'gk',diff:'difficult',q:'Which of these is NOT a permanent member of the UN Security Council?',options:['Germany','USA','Russia','France'],answer:0},
+{id:'gk-d41',subject:'gk',diff:'difficult',q:'A researcher finds a strong positive correlation between ice-cream sales and drowning deaths. The best explanation is:',options:['a third variable (summer heat) drives both','ice cream causes drowning','drowning causes ice-cream sales','a random coincidence with no meaning'],answer:0},
+{id:'gk-d42',subject:'gk',diff:'difficult',q:'The "butterfly effect" in chaos theory refers to:',options:['small changes producing large, unpredictable outcomes','symmetry in nature','migration patterns of butterflies','genetic mutations in insects'],answer:0},
+{id:'gk-d43',subject:'gk',diff:'difficult',q:'Nigeria\'s "Federal Character" principle is designed to:',options:['promote ethnic balance in public appointments','encourage state secession','limit federal powers','protect minority religions only'],answer:0},
+{id:'gk-d44',subject:'gk',diff:'difficult',q:'Which theory argues that developing nations are kept poor by their structural position in the global economy?',options:['Dependency theory','Modernisation theory','Neoliberalism','Keynesianism'],answer:0},
+{id:'gk-d45',subject:'gk',diff:'difficult',q:'In a Punnett cross between blood types AB and O, the possible offspring blood types are:',options:['A and B','A only','B only','A, B, AB, and O'],answer:0},
+{id:'gk-d45',subject:'gk',diff:'difficult',q:'In a Punnett cross between blood types AB and O, the possible offspring blood types are:',options:['A and B','A only','B only','A, B, AB, and O'],answer:0},
+
+/* ═══════════════ EXPANSION PACK #2 ═══════════════ */
+
+/* ═══ MATHS EASY — IGCSE Core / WAEC Foundation (20) ═══ */
+{id:'ma-e46',subject:'math',diff:'easy',q:'Solve for x: 4x − 7 = 2x + 9.',options:['8','6','10','4'],answer:0},
+{id:'ma-e47',subject:'math',diff:'easy',q:'Simplify: 5a − 2b + 3a + 4b.',options:['8a + 2b','8a − 2b','2a + 2b','8a + 6b'],answer:0},
+{id:'ma-e48',subject:'math',diff:'easy',q:'Expand: (x + 4)(x − 3).',options:['x² + x − 12','x² − x − 12','x² + 7x − 12','x² + x + 12'],answer:0},
+{id:'ma-e49',subject:'math',diff:'easy',q:'Convert 45% to a fraction in lowest terms.',options:['9/20','45/100','4/5','5/9'],answer:0},
+{id:'ma-e50',subject:'math',diff:'easy',q:'What is the HCF of 24 and 36?',options:['12','6','8','4'],answer:0},
+{id:'ma-e51',subject:'math',diff:'easy',q:'Find the value of 4! (4 factorial).',options:['24','12','16','8'],answer:0},
+{id:'ma-e52',subject:'math',diff:'easy',q:'A triangle has angles 65° and 45°. What is the third angle?',options:['70°','60°','80°','90°'],answer:0},
+{id:'ma-e53',subject:'math',diff:'easy',q:'Simplify: 2⁴ × 2³.',options:['128','64','512','256'],answer:0},
+{id:'ma-e54',subject:'math',diff:'easy',q:'The circumference of a circle of radius 7 cm (π = 22/7) is:',options:['44 cm','22 cm','154 cm','88 cm'],answer:0},
+{id:'ma-e55',subject:'math',diff:'easy',q:'Convert 3.5 to a mixed number in simplest form.',options:['3 1/2','3 5/10','3 1/3','3 2/5'],answer:0},
+{id:'ma-e56',subject:'math',diff:'easy',q:'Solve: x/4 + 3 = 7.',options:['16','12','20','8'],answer:0},
+{id:'ma-e57',subject:'math',diff:'easy',q:'If 3 pencils cost ₦180, what is the cost of 7 pencils?',options:['₦420','₦360','₦480','₦400'],answer:0},
+{id:'ma-e58',subject:'math',diff:'easy',q:'What is the value of π to 2 decimal places?',options:['3.14','3.15','3.13','3.16'],answer:0},
+{id:'ma-e59',subject:'math',diff:'easy',q:'If a = 2, b = −3, c = 4, evaluate a² + b + c.',options:['5','7','3','9'],answer:0},
+{id:'ma-e60',subject:'math',diff:'easy',q:'A sum of ₦2,400 is shared in ratio 2:3:1. What is the largest share?',options:['₦1,200','₦1,000','₦800','₦1,400'],answer:0},
+{id:'ma-e61',subject:'math',diff:'easy',q:'Simplify: 2/5 × 15/4.',options:['3/2','5/2','3/4','6/5'],answer:0},
+{id:'ma-e62',subject:'math',diff:'easy',q:'Solve: 2x − 5 < 7 (for integer x, find the largest value).',options:['5','6','7','4'],answer:0},
+{id:'ma-e63',subject:'math',diff:'easy',q:'A pen is sold for ₦120 at a loss of 20%. What was its cost price?',options:['₦150','₦140','₦160','₦130'],answer:0},
+{id:'ma-e64',subject:'math',diff:'easy',q:'Write 0.00045 in standard form.',options:['4.5 × 10⁻⁴','4.5 × 10⁻³','45 × 10⁻⁵','4.5 × 10⁴'],answer:0},
+{id:'ma-e65',subject:'math',diff:'easy',q:'Find the median of: 7, 3, 9, 5, 11, 4.',options:['6','5','7','9'],answer:0},
+
+/* ═══ MATHS HARD — SAT L1 / WAEC Advanced (25) ═══ */
+{id:'ma-h46',subject:'math',diff:'hard',q:'In the expansion of (1 + 2x)⁵, the coefficient of x³ is:',options:['80','40','160','10'],answer:0},
+{id:'ma-h47',subject:'math',diff:'hard',q:'Find the sum of the first 15 terms of the AP 7, 11, 15, ...',options:['525','515','520','530'],answer:0},
+{id:'ma-h48',subject:'math',diff:'hard',q:'If cot θ = 4/3 and θ is acute, find sec θ.',options:['5/4','3/5','5/3','4/5'],answer:0},
+{id:'ma-h49',subject:'math',diff:'hard',q:'Simplify: log₃(81) − log₃(9) + log₃(1).',options:['2','3','1','0'],answer:0},
+{id:'ma-h50',subject:'math',diff:'hard',q:'The 5th and 12th terms of an AP are 14 and 42. Find the sum of the first 20 terms.',options:['830','810','850','800'],answer:0},
+{id:'ma-h51',subject:'math',diff:'hard',q:'Solve: 3ˣ⁺¹ = 81. Then find 2ˣ.',options:['8','16','4','32'],answer:0},
+{id:'ma-h52',subject:'math',diff:'hard',q:'If A varies directly as r² and A = 154 when r = 7 (using π = 22/7), find A when r = 10.',options:['314','300','350','250'],answer:0},
+{id:'ma-h53',subject:'math',diff:'hard',q:'The roots of x² − 8x + k = 0 differ by 4. Find k.',options:['12','15','10','20'],answer:0},
+{id:'ma-h54',subject:'math',diff:'hard',q:'A bag contains 5 red and 3 blue balls. Two are drawn without replacement. What is P(same colour)?',options:['13/28','15/56','1/2','5/14'],answer:0},
+{id:'ma-h55',subject:'math',diff:'hard',q:'Find the equation of the line perpendicular to y = 2x + 3 passing through (4, 1).',options:['x + 2y = 6','2x + y = 9','x − 2y = 2','2x − y = 7'],answer:0},
+{id:'ma-h56',subject:'math',diff:'hard',q:'If cos A = 5/13 and A is acute, find tan 2A.',options:['120/119','60/119','12/5','5/12'],answer:0},
+{id:'ma-h57',subject:'math',diff:'hard',q:'Three consecutive terms of a GP are (x − 1), (x + 1), (2x + 3). Find x.',options:['5','3','4','6'],answer:0},
+{id:'ma-h58',subject:'math',diff:'hard',q:'Simplify: (2/√3) + (√3/2).',options:['7√3/6','5√3/6','√3','2√3/3'],answer:0},
+{id:'ma-h59',subject:'math',diff:'hard',q:'Given that f(x) = 2x + 1 and g(x) = x² − 3, find f(g(2)).',options:['3','5','1','7'],answer:0},
+{id:'ma-h60',subject:'math',diff:'hard',q:'The angle of elevation of the top of a tower is 45° from a point 30 m away. Find the tower\'s height.',options:['30 m','15 m','45 m','60 m'],answer:0},
+{id:'ma-h61',subject:'math',diff:'hard',q:'If α and β are the roots of 3x² − 4x + 1 = 0, find αβ.',options:['1/3','4/3','−4/3','3'],answer:0},
+{id:'ma-h62',subject:'math',diff:'hard',q:'Solve simultaneously: x + 2y = 7 and x² + y² = 10. Find y (positive).',options:['3','2','4','1'],answer:0},
+{id:'ma-h63',subject:'math',diff:'hard',q:'A sum of ₦8,000 is invested at 12% per annum simple interest. How long until it becomes ₦12,800?',options:['5 years','4 years','6 years','3 years'],answer:0},
+{id:'ma-h64',subject:'math',diff:'hard',q:'The area of a triangle with sides 7, 8, 9 (using Heron\'s formula) is approximately:',options:['26.8','28','24','30'],answer:0},
+{id:'ma-h65',subject:'math',diff:'hard',q:'If the nth term of a sequence is 2n² + 3n + 1, find the 10th term.',options:['231','221','241','211'],answer:0},
+{id:'ma-h66',subject:'math',diff:'hard',q:'Two chords of a circle are 6 cm and 8 cm; they intersect. If one chord is divided into 4 cm and 5 cm, find the parts of the other.',options:['2 and 6','3 and 5','1 and 7','2.5 and 5.5'],answer:0},
+{id:'ma-h67',subject:'math',diff:'hard',q:'A cone has radius 6 cm and height 8 cm. Find its volume (π = 22/7).',options:['302 cm³','300 cm³','250 cm³','350 cm³'],answer:0},
+{id:'ma-h68',subject:'math',diff:'hard',q:'Simplify: (x² − 4)/(x² + 3x + 2).',options:['(x − 2)/(x + 1)','(x + 2)/(x + 1)','x − 2','x + 2'],answer:0},
+{id:'ma-h69',subject:'math',diff:'hard',q:'In how many ways can a committee of 3 be selected from 8 people?',options:['56','24','336','112'],answer:0},
+{id:'ma-h70',subject:'math',diff:'hard',q:'If log₁₀(2) = 0.3010, find log₁₀(8) approximately.',options:['0.903','0.602','1.204','0.803'],answer:0},
+
+/* ═══ MATHS DIFFICULT — STEP / Further Maths / SAT L2 (25) ═══ */
+{id:'ma-d51',subject:'math',diff:'difficult',q:'Find the sum of the infinite GP: 1 − 1/3 + 1/9 − 1/27 + ...',options:['3/4','2/3','1/2','4/5'],answer:0},
+{id:'ma-d52',subject:'math',diff:'difficult',q:'If z = 3 + 4i, find |z|².',options:['25','5','7','16'],answer:0},
+{id:'ma-d53',subject:'math',diff:'difficult',q:'Differentiate y = x³ sin x with respect to x.',options:['x²(3 sin x + x cos x)','3x² sin x','x³ cos x','x² cos x'],answer:0},
+{id:'ma-d54',subject:'math',diff:'difficult',q:'Evaluate ∫ (1/x) dx from x = 1 to x = e.',options:['1','e','0','ln 2'],answer:0},
+{id:'ma-d55',subject:'math',diff:'difficult',q:'Find the inverse of the matrix [[1, 2], [3, 5]].',options:['[[−5, 2], [3, −1]]','[[5, −2], [−3, 1]]','[[1, −2], [−3, 5]]','[[−1, 2], [3, −5]]'],answer:0},
+{id:'ma-d56',subject:'math',diff:'difficult',q:'If sin A + cos A = 1/2, find sin 2A.',options:['−3/4','3/4','1/2','−1/4'],answer:0},
+{id:'ma-d57',subject:'math',diff:'difficult',q:'Solve: 2^(2x+1) − 5(2ˣ) + 2 = 0. Find the sum of the two values of x.',options:['0','1','2','−1'],answer:0},
+{id:'ma-d58',subject:'math',diff:'difficult',q:'Find the coefficient of x⁴ in the expansion of (2 − x)⁶.',options:['60','−60','120','−120'],answer:0},
+{id:'ma-d59',subject:'math',diff:'difficult',q:'Solve the inequality: (x − 1)/(x + 2) > 0.',options:['x < −2 or x > 1','−2 < x < 1','x > 1 only','x < −2 only'],answer:0},
+{id:'ma-d60',subject:'math',diff:'difficult',q:'A particle moves such that s = t³ − 6t² + 9t. When is it momentarily at rest?',options:['t = 1 or 3','t = 0 or 2','t = 2 or 4','t = 1 only'],answer:0},
+{id:'ma-d61',subject:'math',diff:'difficult',q:'Find the general solution of the quadratic inequality x² − x − 6 ≤ 0.',options:['−2 ≤ x ≤ 3','x ≤ −2 or x ≥ 3','0 ≤ x ≤ 3','x ≥ −2'],answer:0},
+{id:'ma-d62',subject:'math',diff:'difficult',q:'If α, β, γ are the roots of x³ − 6x² + 11x − 6 = 0, find αβγ.',options:['6','11','−6','1'],answer:0},
+{id:'ma-d63',subject:'math',diff:'difficult',q:'Find the value of ∑ⁿ₌₁^∞ (3/4)ⁿ.',options:['3','1','4','12'],answer:0},
+{id:'ma-d64',subject:'math',diff:'difficult',q:'If A and B are independent events with P(A) = 0.4 and P(B) = 0.5, find P(A∪B).',options:['0.7','0.9','0.2','0.6'],answer:0},
+{id:'ma-d65',subject:'math',diff:'difficult',q:'Simplify: (cos 2x)/(cos x + sin x).',options:['cos x − sin x','cos x + sin x','1','sin 2x'],answer:0},
+{id:'ma-d66',subject:'math',diff:'difficult',q:'Find the equation of the tangent to y = x³ − 2x at x = 1.',options:['y = x − 2','y = 3x − 4','y = x + 2','y = 2x − 3'],answer:0},
+{id:'ma-d67',subject:'math',diff:'difficult',q:'If a coin is biased so P(H) = 2/3, find the probability of getting exactly 2 heads in 3 flips.',options:['4/9','2/9','8/27','1/3'],answer:0},
+{id:'ma-d68',subject:'math',diff:'difficult',q:'Solve for x: |x − 2| + |x + 3| = 7.',options:['x = 3 or x = −4','x = 1 or −2','x = 4 only','x = −3 or 2'],answer:0},
+{id:'ma-d69',subject:'math',diff:'difficult',q:'A car depreciates by 15% in year 1 and 10% in year 2. If original price is ₦2,000,000, find its value after 2 years.',options:['₦1,530,000','₦1,500,000','₦1,600,000','₦1,450,000'],answer:0},
+{id:'ma-d70',subject:'math',diff:'difficult',q:'Find the point of intersection of y = x² and y = 2x + 3.',options:['(3, 9) and (−1, 1)','(2, 4) and (−1, 1)','(1, 1) and (−3, 9)','(3, 9) only'],answer:0},
+{id:'ma-d71',subject:'math',diff:'difficult',q:'The tangent to the curve y = x² + 3x − 4 at x = 2 makes what angle with the x-axis?',options:['≈ 84°','≈ 45°','≈ 60°','≈ 30°'],answer:0},
+{id:'ma-d72',subject:'math',diff:'difficult',q:'If x + y + z = 6, xy + yz + zx = 11, find x² + y² + z².',options:['14','12','16','18'],answer:0},
+{id:'ma-d73',subject:'math',diff:'difficult',q:'Find the value of k if the line y = kx + 1 is tangent to the circle x² + y² = 5.',options:['±2','±1','±3','±4'],answer:0},
+{id:'ma-d74',subject:'math',diff:'difficult',q:'The probability that a student passes Maths is 0.6; the probability they pass both Maths and Physics is 0.3. Given they passed Maths, find P(pass Physics).',options:['0.5','0.3','0.6','0.9'],answer:0},
+{id:'ma-d75',subject:'math',diff:'difficult',q:'Find the sum of the roots of 4x² − 3x + 8 = 0.',options:['3/4','−3/4','2','8/4'],answer:0},
+
+/* ═══ ENGLISH EASY — SAT Medium / WAEC (20) ═══ */
+{id:'en-e41',subject:'english',diff:'easy',q:'The negotiations reached a ______ when neither side would compromise.',options:['deadlock','deadline','debacle','début'],answer:0},
+{id:'en-e42',subject:'english',diff:'easy',q:'Her argument was ______ by the new evidence.',options:['undermined','undertaken','underestimated','underlined'],answer:0},
+{id:'en-e43',subject:'english',diff:'easy',q:'Choose the correctly punctuated sentence.',options:['The man, who was late, missed the train.','The man who was late, missed the train.','The man, who was late missed the train.','The man who, was late, missed the train.'],answer:0},
+{id:'en-e44',subject:'english',diff:'easy',q:'The doctor\'s ______ manner reassured the anxious patient.',options:['affable','abrasive','abrupt','arrogant'],answer:0},
+{id:'en-e45',subject:'english',diff:'easy',q:'The committee reached a ______ decision — everyone agreed.',options:['unanimous','anonymous','ambiguous','animous'],answer:0},
+{id:'en-e46',subject:'english',diff:'easy',q:'Choose the correctly spelt word.',options:['necessary','neccessary','necesary','necessery'],answer:0},
+{id:'en-e47',subject:'english',diff:'easy',q:'She has an ______ memory; she forgets nothing.',options:['infallible','fallible','infernal','infectious'],answer:0},
+{id:'en-e48',subject:'english',diff:'easy',q:'The witness gave a ______ account of the incident.',options:['lucid','lurid','lousy','lively'],answer:0},
+{id:'en-e49',subject:'english',diff:'easy',q:'Choose the correct form: "The news ___ good today."',options:['is','are','were','have been'],answer:0},
+{id:'en-e50',subject:'english',diff:'easy',q:'He was ______ from the meeting for arriving late.',options:['excluded','exclusive','excused from','excelled'],answer:0},
+{id:'en-e51',subject:'english',diff:'easy',q:'"Gullible" means:',options:['easily deceived','stubborn','greedy','generous'],answer:0},
+{id:'en-e52',subject:'english',diff:'easy',q:'The ______ of the two roads confused the traveller.',options:['junction','conjunction','junction','juncture'],answer:0},
+{id:'en-e53',subject:'english',diff:'easy',q:'Choose the correct use of apostrophe:',options:['The girls\' bags were heavy.','The girl\'s bags were heavy (for multiple girls).','The girls bags were heavy.','The girls\'s bags were heavy.'],answer:0},
+{id:'en-e54',subject:'english',diff:'easy',q:'Her speech was ______; it inspired everyone in the hall.',options:['rousing','roused','routed','routed'],answer:0},
+{id:'en-e55',subject:'english',diff:'easy',q:'The teacher was ______ to see the student\'s improvement.',options:['gratified','grateful','granted','gratified'],answer:0},
+{id:'en-e56',subject:'english',diff:'easy',q:'"To take with a grain of salt" means:',options:['to be skeptical','to add flavour','to accept eagerly','to share'],answer:0},
+{id:'en-e57',subject:'english',diff:'easy',q:'The new regulation is ______ to all employees.',options:['applicable','applicant','applicably','applied'],answer:0},
+{id:'en-e58',subject:'english',diff:'easy',q:'He speaks English ______ than his brother.',options:['more fluently','most fluently','fluentlier','fluentest'],answer:0},
+{id:'en-e59',subject:'english',diff:'easy',q:'Choose the correctly constructed sentence.',options:['The book, which I borrowed yesterday, was fascinating.','The book which I borrowed yesterday, was fascinating.','The book, which I borrowed yesterday was fascinating.','The book which, I borrowed yesterday, was fascinating.'],answer:0},
+{id:'en-e60',subject:'english',diff:'easy',q:'A ______ is a word opposite in meaning to another.',options:['antonym','synonym','homonym','acronym'],answer:0},
+
+/* ═══ ENGLISH HARD — SAT / JAMB Advanced (25) ═══ */
+{id:'en-h46',subject:'english',diff:'hard',q:'A scientist argues: "Since chemical X reduced tumours in mice, it will cure cancer in humans." The reasoning is flawed because:',options:['results in mice do not automatically transfer to humans','mice are not mammals','cancer has many forms','chemicals cannot cure diseases'],answer:0},
+{id:'en-h47',subject:'english',diff:'hard',q:'"The proposal, however well-intentioned, is financially unviable." The author\'s position is:',options:['sympathetic to intent but critical of feasibility','enthusiastically supportive','completely indifferent','purely emotional'],answer:0},
+{id:'en-h48',subject:'english',diff:'hard',q:'Which sentence best uses "however" as a conjunctive adverb?',options:['The cost was high; however, we proceeded.','However the cost, we proceeded.','We however proceeded, the cost.','We proceeded however, the cost.'],answer:0},
+{id:'en-h49',subject:'english',diff:'hard',q:'"He was a man of parts." This idiom means he was:',options:['talented in many ways','partly trustworthy','physically fragmented','partially educated'],answer:0},
+{id:'en-h50',subject:'english',diff:'hard',q:'The word "compunction" most nearly means:',options:['a feeling of guilt or moral scruple','compassion','composure','compulsion'],answer:0},
+{id:'en-h51',subject:'english',diff:'hard',q:'Which best replaces the underlined portion for concision? "The reason why the project failed was because of the fact that funding was insufficient."',options:['The project failed because funding was insufficient.','The reason for the failure was because of insufficient funding.','The failure was due to the reason that funding was insufficient.','The project failed due to the fact that funding was insufficient.'],answer:0},
+{id:'en-h52',subject:'english',diff:'hard',q:'A passage states: "Poverty rates fell after the subsidy." A critic counters: "Poverty also fell in regions without the subsidy." The critic is arguing:',options:['against a causal claim by showing correlation without causation','that subsidies are useless','that poverty always falls','against regional development'],answer:0},
+{id:'en-h53',subject:'english',diff:'hard',q:'The word "obstreperous" most nearly means:',options:['noisily and aggressively unruly','obstinate in silence','strongly built','mild-mannered'],answer:0},
+{id:'en-h54',subject:'english',diff:'hard',q:'Which sentence is stylistically strongest (active, concise)?',options:['The committee rejected the motion.','The motion was rejected by the committee.','The rejection of the motion was done by the committee.','A rejection was made by the committee of the motion.'],answer:0},
+{id:'en-h55',subject:'english',diff:'hard',q:'The expression "to gild the lily" means to:',options:['unnecessarily embellish something already beautiful','vandalise something precious','paint with gold','refuse a gift'],answer:0},
+{id:'en-h56',subject:'english',diff:'hard',q:'Her explanation, though ______, was ultimately unconvincing.',options:['erudite','ignorant','incoherent','irrelevant'],answer:0},
+{id:'en-h57',subject:'english',diff:'hard',q:'The new evidence seemed to ______ the defendant rather than exonerate him.',options:['inculpate','exculpate','culpable','incarcerate'],answer:0},
+{id:'en-h58',subject:'english',diff:'hard',q:'In an argument essay, a "counterclaim" is:',options:['a position opposing the writer\'s thesis','a supporting fact','a call to action','a conclusion'],answer:0},
+{id:'en-h59',subject:'english',diff:'hard',q:'"The professor\'s style, at once arcane and precise, baffled his students." The word "arcane" most nearly means:',options:['understood by few','outdated','magical','vulgar'],answer:0},
+{id:'en-h60',subject:'english',diff:'hard',q:'Choose the sentence that correctly uses a dash.',options:['The result — a stunning upset — shocked everyone.','The result - a stunning upset, shocked everyone.','The result, a stunning upset — shocked everyone.','The result a stunning upset — shocked everyone.'],answer:0},
+{id:'en-h61',subject:'english',diff:'hard',q:'The candidate\'s answer was ______: it addressed the question without committing to any concrete position.',options:['evasive','candid','forthright','unequivocal'],answer:0},
+{id:'en-h62',subject:'english',diff:'hard',q:'Choose the correct sentence.',options:['The data suggest a clear trend.','The data suggests a clear trend.','The datas suggest a clear trend.','The data are suggesting a clear trend.'],answer:0},
+{id:'en-h63',subject:'english',diff:'hard',q:'The word "recalcitrant" most nearly means:',options:['stubbornly resistant to authority','frequently returning','slow to learn','physically restless'],answer:0},
+{id:'en-h64',subject:'english',diff:'hard',q:'A logical fallacy where one attacks the person rather than the argument is called:',options:['ad hominem','ad populum','ad verecundiam','ad nauseam'],answer:0},
+{id:'en-h65',subject:'english',diff:'hard',q:'"To be hoisted by one\'s own petard" means:',options:['to be harmed by one\'s own scheme','to be publicly praised','to be lifted to honour','to be wronged unfairly'],answer:0},
+{id:'en-h66',subject:'english',diff:'hard',q:'His position was ______: he condemned the war but voted to fund it.',options:['paradoxical','hypocritical','tenable','coherent'],answer:0},
+{id:'en-h67',subject:'english',diff:'hard',q:'The clause "although he was tired" is an example of:',options:['a subordinate clause','a main clause','a phrase','an independent clause'],answer:0},
+{id:'en-h68',subject:'english',diff:'hard',q:'The word "vociferous" most nearly means:',options:['expressing views loudly and forcefully','reluctant to speak','speaking ambiguously','whispering softly'],answer:0},
+{id:'en-h69',subject:'english',diff:'hard',q:'Which sentence uses "lie/lay" correctly?',options:['The book lies on the table.','The book lays on the table.','I lie the book on the table.','He lays on the bed.'],answer:0},
+{id:'en-h70',subject:'english',diff:'hard',q:'"Ephemeral fame" means fame that is:',options:['short-lived','worldwide','intense','undeserved'],answer:0},
+
+/* ═══ ENGLISH DIFFICULT — GRE / SAT Advanced (25) ═══ */
+{id:'en-d46',subject:'english',diff:'difficult',q:'A passage argues: "Freedom of speech must be absolute; any restriction on speech is a step toward tyranny." The argument\'s weakest point is:',options:['it ignores speech that causes direct harm (e.g., incitement to violence)','it is too emotional','it relies on statistics','it is written in the passive voice'],answer:0},
+{id:'en-d47',subject:'english',diff:'difficult',q:'"The statesman\'s rhetoric, however honeyed, concealed a ruthlessness rarely seen." The word "honeyed" most nearly means:',options:['sweet-sounding but insincere','filled with honey','warm and genuine','thick and slow'],answer:0},
+{id:'en-d48',subject:'english',diff:'difficult',q:'The philosopher\'s argument, though internally ______, failed to account for a critical empirical objection.',options:['coherent','incoherent','verbose','obscure'],answer:0},
+{id:'en-d49',subject:'english',diff:'difficult',q:'Which of these best illustrates "begging the question" (petitio principii)?',options:['The book is true because it says so on page one.','The book is boring because I dislike it.','The book is long, so it must be important.','Everyone loves the book, so it is good.'],answer:0},
+{id:'en-d50',subject:'english',diff:'difficult',q:'The critic\'s review, at once ______ and ______, praised the novel\'s ambition while lamenting its execution.',options:['generous … regretful','damning … effusive','terse … vague','harsh … unkind'],answer:0},
+{id:'en-d51',subject:'english',diff:'difficult',q:'"The historian\'s account is not so much inaccurate as selective — a subtle form of distortion." The author is claiming the historian:',options:['misleads through omission rather than falsehood','deliberately lies','is completely reliable','is unqualified'],answer:0},
+{id:'en-d52',subject:'english',diff:'difficult',q:'The word "perfidy" most nearly means:',options:['deliberate betrayal of trust','perfection','perplexity','persistence'],answer:0},
+{id:'en-d53',subject:'english',diff:'difficult',q:'The argument "All A are B; all B are C; therefore all A are C" is an example of:',options:['a valid syllogism','a logical fallacy','an inductive generalisation','a tautology'],answer:0},
+{id:'en-d54',subject:'english',diff:'difficult',q:'"The minister\'s statement was more a stratagem than a clarification." The word "stratagem" implies:',options:['a calculated tactic','an honest explanation','an accident','a public apology'],answer:0},
+{id:'en-d55',subject:'english',diff:'difficult',q:'Choose the option that best captures the meaning of "the argument is a non sequitur":',options:['the conclusion does not follow from the premises','the argument is invalid because it is short','the argument uses complex vocabulary','the argument is emotionally manipulative'],answer:0},
+{id:'en-d56',subject:'english',diff:'difficult',q:'The author\'s prose is characterised by a ______ restraint — emotion implied rather than expressed.',options:['studied','spontaneous','slapdash','fervent'],answer:0},
+{id:'en-d57',subject:'english',diff:'difficult',q:'"His concession was less an admission of error than a tactical retreat." This sentence suggests his concession was:',options:['strategic rather than sincere','forced and unwilling','warmly generous','entirely unplanned'],answer:0},
+{id:'en-d58',subject:'english',diff:'difficult',q:'The word "inimical" most nearly means:',options:['harmful or hostile to','friendly toward','similar to','indifferent to'],answer:0},
+{id:'en-d59',subject:'english',diff:'difficult',q:'A historian writes: "The revolution was inevitable." The strongest objection is that:',options:['inevitability claims often ignore contingency and counterfactual evidence','revolutions never happen','historians cannot write about revolutions','the revolution occurred in the past'],answer:0},
+{id:'en-d60',subject:'english',diff:'difficult',q:'The word "assiduous" most nearly means:',options:['showing great care and perseverance','careless and lazy','assertive','artistic'],answer:0},
+{id:'en-d61',subject:'english',diff:'difficult',q:'"The argument, though superficially attractive, ______ under scrutiny."',options:['collapses','strengthens','persists','expands'],answer:0},
+{id:'en-d62',subject:'english',diff:'difficult',q:'The word "intransigent" most nearly means:',options:['refusing to compromise','wandering aimlessly','in transition','highly intelligent'],answer:0},
+{id:'en-d63',subject:'english',diff:'difficult',q:'"Epistemic humility" in academic writing refers to:',options:['acknowledging the limits of one\'s knowledge','religious modesty','humility toward colleagues','avoiding all claims'],answer:0},
+{id:'en-d64',subject:'english',diff:'difficult',q:'"The author\'s tone is elegiac." This suggests a tone of:',options:['mournful reflection','joyful celebration','bitter sarcasm','neutral detachment'],answer:0},
+{id:'en-d65',subject:'english',diff:'difficult',q:'The word "obfuscate" most nearly means:',options:['to make unclear','to make clear','to openly oppose','to quietly agree'],answer:0},
+{id:'en-d66',subject:'english',diff:'difficult',q:'Which best captures "the law is a blunt instrument"?',options:['Legal remedies often lack nuance for complex situations','The law is physically heavy','The law is poorly written','Legal systems are cheap'],answer:0},
+{id:'en-d67',subject:'english',diff:'difficult',q:'"His apology was so full of qualifiers that it ceased to be an apology at all." The author implies:',options:['hedging undermines sincerity','apologies should be long','qualifiers are grammatically wrong','apologies are always insincere'],answer:0},
+{id:'en-d68',subject:'english',diff:'difficult',q:'The word "sagacious" most nearly means:',options:['showing keen judgment','sagging under weight','sacrilegious','sanctimonious'],answer:0},
+{id:'en-d69',subject:'english',diff:'difficult',q:'"The proposal\'s logic is impeccable; its premises are, however, dubious." The author\'s point is:',options:['valid reasoning from false assumptions still produces unreliable conclusions','logic is unimportant','premises are always false','the proposal is definitely correct'],answer:0},
+{id:'en-d70',subject:'english',diff:'difficult',q:'The word "opprobrium" most nearly means:',options:['harsh public criticism','opportunism','opportunity','optimism'],answer:0},
+
+/* ═══ GK EASY — WAEC / NECO Foundation (15) ═══ */
+{id:'gk-e41',subject:'gk',diff:'easy',q:'Which organ pumps blood around the body?',options:['Heart','Liver','Lungs','Kidney'],answer:0},
+{id:'gk-e42',subject:'gk',diff:'easy',q:'The process by which water changes to vapour is called:',options:['evaporation','condensation','precipitation','sublimation'],answer:0},
+{id:'gk-e43',subject:'gk',diff:'easy',q:'The capital of Ghana is:',options:['Accra','Kumasi','Tamale','Cape Coast'],answer:0},
+{id:'gk-e44',subject:'gk',diff:'easy',q:'Which is the largest continent by population?',options:['Asia','Africa','Europe','North America'],answer:0},
+{id:'gk-e45',subject:'gk',diff:'easy',q:'The decimal system has how many digits?',options:['10','8','2','16'],answer:0},
+{id:'gk-e46',subject:'gk',diff:'easy',q:'The father of modern computers is often considered to be:',options:['Charles Babbage','Alan Turing','Bill Gates','John von Neumann'],answer:0},
+{id:'gk-e47',subject:'gk',diff:'easy',q:'The largest country in the world by area is:',options:['Russia','Canada','China','USA'],answer:0},
+{id:'gk-e48',subject:'gk',diff:'easy',q:'Which language has the most native speakers?',options:['Mandarin Chinese','English','Spanish','Hindi'],answer:0},
+{id:'gk-e49',subject:'gk',diff:'easy',q:'The 1999 Nigerian Constitution has how many chapters?',options:['8','6','10','12'],answer:0},
+{id:'gk-e50',subject:'gk',diff:'easy',q:'Water covers approximately what percent of Earth\'s surface?',options:['71%','50%','60%','85%'],answer:0},
+{id:'gk-e51',subject:'gk',diff:'easy',q:'Which planet is closest to the Sun?',options:['Mercury','Venus','Earth','Mars'],answer:0},
+{id:'gk-e52',subject:'gk',diff:'easy',q:'The process of converting sugar to alcohol by yeast is called:',options:['fermentation','respiration','digestion','oxidation'],answer:0},
+{id:'gk-e53',subject:'gk',diff:'easy',q:'The Nigerian naira was introduced in:',options:['1973','1960','1963','1965'],answer:0},
+{id:'gk-e54',subject:'gk',diff:'easy',q:'Blood is red because of:',options:['haemoglobin','plasma','platelets','white blood cells'],answer:0},
+{id:'gk-e55',subject:'gk',diff:'easy',q:'Which instrument measures atmospheric pressure?',options:['Barometer','Thermometer','Hygrometer','Anemometer'],answer:0},
+
+/* ═══ GK HARD — WAEC / NECO / JAMB Advanced (20) ═══ */
+{id:'gk-h46',subject:'gk',diff:'hard',q:'In the periodic table, elements are arranged primarily by:',options:['increasing atomic number','increasing atomic mass','alphabetical order','density'],answer:0},
+{id:'gk-h47',subject:'gk',diff:'hard',q:'The "elastic clause" in the US Constitution is analogous to which Nigerian constitutional feature?',options:['the "necessary and proper" powers of the National Assembly','the Preamble','the Fundamental Rights chapter','the Federal Character principle'],answer:0},
+{id:'gk-h48',subject:'gk',diff:'hard',q:'A dihybrid cross is one that examines:',options:['two traits simultaneously','one trait at a time','three traits at once','only sex-linked traits'],answer:0},
+{id:'gk-h49',subject:'gk',diff:'hard',q:'Which gas is primarily responsible for the greenhouse effect?',options:['Carbon dioxide','Oxygen','Nitrogen','Hydrogen'],answer:0},
+{id:'gk-h50',subject:'gk',diff:'hard',q:'The Nigerian Council of State advises the President on:',options:['policy matters and appointments to key offices','only military affairs','religious matters','foreign treaties'],answer:0},
+{id:'gk-h51',subject:'gk',diff:'hard',q:'The discovery of penicillin revolutionised medicine by introducing:',options:['antibiotics','vaccines','anaesthesia','surgery'],answer:0},
+{id:'gk-h52',subject:'gk',diff:'hard',q:'The term "genotype" refers to:',options:['the genetic makeup of an organism','the visible traits of an organism','a mutated gene','the number of chromosomes'],answer:0},
+{id:'gk-h53',subject:'gk',diff:'hard',q:'Which body settles trade disputes between nations?',options:['WTO','WHO','UNESCO','ICJ'],answer:0},
+{id:'gk-h54',subject:'gk',diff:'hard',q:'The 1997 Kyoto Protocol was superseded by:',options:['the 2015 Paris Agreement','the 2000 Millennium Declaration','the 1990 Montreal Protocol','the 1992 Rio Summit'],answer:0},
+{id:'gk-h55',subject:'gk',diff:'hard',q:'An allele is best defined as:',options:['one of two or more alternative forms of a gene','a chromosome','a protein','a cell'],answer:0},
+{id:'gk-h56',subject:'gk',diff:'hard',q:'In economics, GDP measures:',options:['the total value of goods and services produced in a country','the total money supply','government tax revenue','national debt'],answer:0},
+{id:'gk-h57',subject:'gk',diff:'hard',q:'The Nigerian National Assembly consists of:',options:['the Senate and the House of Representatives','only the Senate','the President and governors','state assemblies'],answer:0},
+{id:'gk-h58',subject:'gk',diff:'hard',q:'A homozygous organism has:',options:['two identical alleles for a gene','two different alleles','one allele only','no alleles'],answer:0},
+{id:'gk-h59',subject:'gk',diff:'hard',q:'The process by which DNA is copied before cell division is called:',options:['replication','translation','transcription','mutation'],answer:0},
+{id:'gk-h60',subject:'gk',diff:'hard',q:'The Marshall Plan was a US programme designed to:',options:['rebuild Western Europe after WWII','contain communism in Asia','establish the UN','create NATO'],answer:0},
+{id:'gk-h61',subject:'gk',diff:'hard',q:'The pH scale ranges from:',options:['0 to 14','0 to 7','1 to 10','0 to 100'],answer:0},
+{id:'gk-h62',subject:'gk',diff:'hard',q:'In a food chain, organisms that break down dead matter are called:',options:['decomposers','producers','consumers','predators'],answer:0},
+{id:'gk-h63',subject:'gk',diff:'hard',q:'The US Declaration of Independence was signed in:',options:['1776','1789','1783','1763'],answer:0},
+{id:'gk-h64',subject:'gk',diff:'hard',q:'ECOWAS has how many member states?',options:['15','12','20','10'],answer:0},
+{id:'gk-h65',subject:'gk',diff:'hard',q:'The mitochondrion is the site of:',options:['cellular respiration','protein synthesis','photosynthesis','DNA replication'],answer:0},
+
+/* ═══ GK DIFFICULT — Scholarship Panel / Olympiad (20) ═══ */
+{id:'gk-d46',subject:'gk',diff:'difficult',q:'In a cross between an individual with blood type AB and an individual with blood type O, what are the possible offspring blood types?',options:['Type A and Type B','Type AB and Type O','Type O only','Type AB only'],answer:0},
+{id:'gk-d47',subject:'gk',diff:'difficult',q:'The term "epistemic injustice" (Miranda Fricker) refers to:',options:['wrong done to someone specifically in their capacity as a knower','unfair taxation','educational inequality','legal miscarriages'],answer:0},
+{id:'gk-d48',subject:'gk',diff:'difficult',q:'The "Washington Consensus" is a term used to describe:',options:['neoliberal economic policies promoted by the IMF and World Bank','a military alliance','a UN resolution','a trade agreement with China'],answer:0},
+{id:'gk-d49',subject:'gk',diff:'difficult',q:'If a man with blood type A (heterozygous I^A i) marries a woman with type B (heterozygous I^B i), what is the probability of a child with type O?',options:['25%','0%','50%','75%'],answer:0},
+{id:'gk-d50',subject:'gk',diff:'difficult',q:'The "Millennium Development Goals" were replaced by the SDGs in:',options:['2015','2000','2010','2020'],answer:0},
+{id:'gk-d51',subject:'gk',diff:'difficult',q:'The political concept of "overlapping consensus" (Rawls) refers to:',options:['agreement among citizens on principles of justice despite differing worldviews','a political coalition','a constitutional amendment','a type of referendum'],answer:0},
+{id:'gk-d52',subject:'gk',diff:'difficult',q:'A test has 40 questions. A student answers 30 correctly, 5 wrong, 5 blank. If 1 mark is awarded per correct and ¼ mark deducted per wrong, what is the net score?',options:['28.75','30','27.5','29'],answer:0},
+{id:'gk-d53',subject:'gk',diff:'difficult',q:'If world GDP grows at 3% annually and population at 1%, per-capita GDP grows at approximately:',options:['2%','3%','4%','1%'],answer:0},
+{id:'gk-d54',subject:'gk',diff:'difficult',q:'The "Sapir–Whorf hypothesis" concerns the relationship between:',options:['language and thought','economics and politics','biology and environment','law and morality'],answer:0},
+{id:'gk-d55',subject:'gk',diff:'difficult',q:'A country\'s Gini coefficient rises from 0.30 to 0.45. This indicates:',options:['increasing income inequality','decreasing inequality','economic growth','population decline'],answer:0},
+{id:'gk-d56',subject:'gk',diff:'difficult',q:'The "Prisoner\'s Dilemma" illustrates a situation where:',options:['individual rationality leads to collective suboptimality','cooperation is always guaranteed','government intervention is always beneficial','there is no dominant strategy'],answer:0},
+{id:'gk-d57',subject:'gk',diff:'difficult',q:'The Nürnberg Trials established the principle that:',options:['individuals can be held accountable under international law even when following state orders','states alone bear responsibility','soldiers cannot be prosecuted for war crimes','national law always supersedes international law'],answer:0},
+{id:'gk-d58',subject:'gk',diff:'difficult',q:'In statistics, a p-value of 0.03 means:',options:['there is a 3% chance of observing results at least as extreme if the null hypothesis were true','there is a 97% chance the hypothesis is correct','the result is meaningless','the sample size is too small'],answer:0},
+{id:'gk-d59',subject:'gk',diff:'difficult',q:'The "Demographic Transition Model" describes:',options:['the shift from high birth and death rates to low rates as societies develop','patterns of migration','the rise of urbanisation','the decline of agriculture'],answer:0},
+{id:'gk-d60',subject:'gk',diff:'difficult',q:'Which of the following is an example of a "public good" in economics?',options:['National defence','A private car','A restaurant meal','A mobile phone'],answer:0},
+{id:'gk-d61',subject:'gk',diff:'difficult',q:'The phrase "ceteris paribus" means:',options:['all other things being equal','without exception','by any means','in the long run'],answer:0},
+{id:'gk-d62',subject:'gk',diff:'difficult',q:'The "tragedy of the commons" is best solved by:',options:['defining property rights or imposing collective governance','leaving the resource entirely unregulated','relying on voluntary restraint alone','increasing consumption'],answer:0},
+{id:'gk-d63',subject:'gk',diff:'difficult',q:'In a study, group A receives a drug and group B a placebo, but neither participants nor researchers know who received what. This is called:',options:['a double-blind study','an observational study','a case study','a meta-analysis'],answer:0},
+{id:'gk-d64',subject:'gk',diff:'difficult',q:'"Purchasing power parity" (PPP) is used to:',options:['compare currencies accounting for cost-of-living differences','set exchange rates','measure inflation','tax international trade'],answer:0},
+{id:'gk-d65',subject:'gk',diff:'difficult',q:'Which of the following best describes the "butterfly effect" in political science?',options:['a small local event can trigger large, cascading global consequences','political systems are inherently stable','butterflies are a symbol of democracy','politics follows predictable cycles'],answer:0}
+
+];
+
+
+/* ---------- CONSTANTS ---------- */
+const ALL_SUBJECTS = ['english','math','gk'];
+const SUBJECT_LABEL = {english:'English Language',math:'Mathematics',gk:'General Knowledge'};
+const SUBJECT_SHORT = {english:'EN',math:'MA',gk:'GK'};
+const SUBJECT_ICON  = {english:'📖',math:'📐',gk:'🌍'};
+const SUBJECT_DESC  = {
+  english:'Vocabulary · Grammar · Reading comprehension',
+  math:'Arithmetic · Algebra · Geometry · Probability',
+  gk:'Science · Government · Geography · Genetics'
+};
+const DIFF_LABEL = {easy:'Easy',hard:'Hard',difficult:'Difficult'};
+const DIFF_PTS = {easy:5,hard:10,difficult:15};
+const TEST_LENGTH = 60;
+const TEST_SECONDS = 45 * 60;
+const PASS_MARK = 510;
+
+/* ---------- STATE ---------- */
+let state = {
+  questions: [],
+  answers: [],
+  idx: 0,
+  timeLeft: TEST_SECONDS,
+  timerId: null,
+  finished: false,
+  selectedSubjects: ['english','math','gk']
+};
+
+/* ---------- STORAGE ---------- */
+const LS = {
+  get(k,d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+};
+const USED_KEY = 'dcf_used_ids_v2';
+const ATTEMPTS_KEY = 'dcf_attempts_v2';
+function getUsed(){ return LS.get(USED_KEY,[]); }
+function addUsed(ids){ const u = new Set(getUsed()); ids.forEach(i=>u.add(i)); LS.set(USED_KEY,[...u]); }
+function resetPool(){ LS.set(USED_KEY,[]); renderStats(); alert('Question pool reset. Future tests will reuse questions.'); }
+
+/* ---------- UTIL ---------- */
+function shuffle(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];} return r; }
+function pickN(arr,n){ return shuffle(arr).slice(0,n); }
+
+/* ---------- SUBJECT PICKER ---------- */
+function renderSubjectPicker(){
+  const list = document.getElementById('subjectList');
+  list.innerHTML = ALL_SUBJECTS.map(s=>{
+    const on = state.selectedSubjects.includes(s);
+    const total = BANK.filter(q=>q.subject===s).length;
+    return `<div class="subj-card ${on?'on':''}" data-subj="${s}" onclick="App.toggleSubject('${s}')">
+      <div class="subj-icon">${SUBJECT_ICON[s]}</div>
+      <div class="subj-meta">
+        <b>${SUBJECT_LABEL[s]}</b>
+        <small>${SUBJECT_DESC[s]} · ${total} Qs in bank</small>
+      </div>
+      <div class="subj-check">✓</div>
+    </div>`;
+  }).join('');
+  updatePlanPreview();
+}
+function toggleSubject(s){
+  const i = state.selectedSubjects.indexOf(s);
+  if(i>=0) state.selectedSubjects.splice(i,1);
+  else state.selectedSubjects.push(s);
+  renderSubjectPicker();
+}
+function selectAllSubjects(){ state.selectedSubjects = [...ALL_SUBJECTS]; renderSubjectPicker(); }
+function clearAllSubjects(){ state.selectedSubjects = []; renderSubjectPicker(); }
+
+/* Build dynamic plan for selected subjects.
+   Always 20 per difficulty, 60 total. */
+function buildPlan(selected){
+  const plan = {};
+  const n = selected.length;
+  selected.forEach(s=>plan[s]={easy:0,hard:0,difficult:0});
+  ['easy','hard','difficult'].forEach(diff=>{
+    const base = Math.floor(20/n);
+    const extra = 20 - base*n;
+    selected.forEach((s,i)=> plan[s][diff] = base + (i<extra?1:0));
+  });
+  return plan;
+}
+
+function updatePlanPreview(){
+  const n = state.selectedSubjects.length;
+  const total = document.getElementById('planTotal');
+  const btn = document.getElementById('beginBtn');
+  if(n===0){
+    total.textContent = '—';
+    btn.disabled = true;
+    btn.textContent = 'Select at least one subject';
+  } else {
+    total.textContent = '60';
+    btn.disabled = false;
+    btn.textContent = 'Begin Test';
+  }
+}
+
+/* ---------- BUILD TEST ---------- */
+function buildTest(selected){
+  const plan = buildPlan(selected);
+  const used = new Set(getUsed());
+  const chosen = [];
+  const newlyUsed = [];
+
+  for(const subj of selected){
+    for(const diff of ['easy','hard','difficult']){
+      const need = plan[subj][diff];
+      let pool = BANK.filter(q => q.subject===subj && q.diff===diff && !used.has(q.id));
+      if(pool.length < need){
+        const extra = BANK.filter(q => q.subject===subj && q.diff===diff && used.has(q.id));
+        pool = pool.concat(shuffle(extra));
+      }
+      const picked = pool.slice(0, need);
+      picked.forEach(q => {
+        chosen.push(prepareQuestion(q));
+        newlyUsed.push(q.id);
+      });
+    }
+  }
+
+  const order = {easy:0,hard:1,difficult:2};
+  chosen.sort((a,b)=> order[a.diff]-order[b.diff]);
+  addUsed(newlyUsed);
+  return chosen;
+}
+
+function prepareQuestion(q){
+  const correctText = q.options[q.answer];
+  const shuffled = shuffle(q.options);
+  return {
+    id: q.id, subject: q.subject, diff: q.diff, q: q.q,
+    passage: q.passage ? PASSAGES[q.passage] : null,
+    options: shuffled,
+    answer: shuffled.indexOf(correctText),
+    pts: DIFF_PTS[q.diff]
+  };
+}
+
+/* ---------- SCREEN ROUTER ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='scr-subjects') renderSubjectPicker();
+}
+
+/* ---------- START TEST ---------- */
+function confirmSubjects(){
+  if(state.selectedSubjects.length===0) return;
+  startTest(state.selectedSubjects);
+}
+function startTest(selected){
+  const subjects = selected || state.selectedSubjects;
+  if(subjects.length===0){ alert('Please select at least one subject.'); return; }
+  state.questions = buildTest(subjects);
+  state.answers = new Array(state.questions.length).fill(null);
+  state.idx = 0;
+  state.timeLeft = TEST_SECONDS;
+  state.finished = false;
+  state.testSubjects = [...subjects];
+  showScreen('scr-test');
+  renderQuestion();
+  startTimer();
+}
+
+/* ---------- TIMER ---------- */
+function startTimer(){
+  clearInterval(state.timerId);
+  updateTimerDisplay();
+  state.timerId = setInterval(()=>{
+    state.timeLeft--;
+    updateTimerDisplay();
+    if(state.timeLeft <= 0){
+      clearInterval(state.timerId);
+      finishTest(true);
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  const el = document.getElementById('timer');
+  const m = Math.floor(state.timeLeft/60);
+  const s = state.timeLeft%60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.classList.toggle('warn', state.timeLeft <= 300);
+}
+
+/* ---------- RENDER QUESTION ---------- */
+function renderQuestion(){
+  const q = state.questions[state.idx];
+  const total = state.questions.length;
+  document.getElementById('qCounter').textContent = `Q ${state.idx+1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((state.idx)/total)*100}%`;
+
+  const card = document.getElementById('qcard');
+  let html = `<div class="qmeta">
+      <span class="tag">${SUBJECT_LABEL[q.subject]}</span>
+      <span class="tag" style="color:${q.diff==='easy'?'#10b981':q.diff==='hard'?'#f59e0b':'#e11d48'}">${DIFF_LABEL[q.diff]} · ${q.pts} pts</span>
+    </div>`;
+  if(q.passage) html += `<div class="passage">${q.passage}</div>`;
+  html += `<p class="qtext">${q.q}</p><div class="options">`;
+  q.options.forEach((opt,i)=>{
+    const sel = state.answers[state.idx]===i ? ' sel' : '';
+    html += `<button class="opt${sel}" onclick="App.selectOption(${i})">
+      <span class="k">${'ABCD'[i]}</span><span>${opt}</span></button>`;
+  });
+  html += `</div>`;
+  card.innerHTML = html;
+  card.scrollTop = 0;
+
+  document.getElementById('prevBtn').style.visibility = state.idx===0 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('nextBtn');
+  if(state.idx === state.questions.length-1){
+    nextBtn.textContent = 'Submit Test';
+    nextBtn.classList.remove('btn-primary');
+    nextBtn.classList.add('btn-red');
+  } else {
+    nextBtn.textContent = 'Next';
+    nextBtn.classList.add('btn-primary');
+    nextBtn.classList.remove('btn-red');
+  }
+}
+function selectOption(i){ state.answers[state.idx] = i; renderQuestion(); }
+function nextQ(){
+  if(state.idx === state.questions.length-1){
+    if(confirm('Submit your test now?')) finishTest(false);
+    return;
+  }
+  state.idx++; renderQuestion();
+}
+function prevQ(){ if(state.idx>0){ state.idx--; renderQuestion(); } }
+
+/* ---------- FINISH ---------- */
+function finishTest(auto){
+  if(state.finished) return;
+  state.finished = true;
+  clearInterval(state.timerId);
+
+  let score = 0, maxScore = 0;
+  const bySubject = {};
+  state.testSubjects.forEach(s=> bySubject[s]={c:0,t:0,pts:0,max:0});
+  const byDiff = {easy:{c:0,t:0,pts:0,max:0},hard:{c:0,t:0,pts:0,max:0},difficult:{c:0,t:0,pts:0,max:0}};
+
+  state.questions.forEach((q,i)=>{
+    maxScore += q.pts;
+    bySubject[q.subject].t++; bySubject[q.subject].max += q.pts;
+    byDiff[q.diff].t++; byDiff[q.diff].max += q.pts;
+    if(state.answers[i] === q.answer){
+      score += q.pts;
+      bySubject[q.subject].c++; bySubject[q.subject].pts += q.pts;
+      byDiff[q.diff].c++; byDiff[q.diff].pts += q.pts;
+    }
+  });
+
+  const pct = Math.round((score/maxScore)*100);
+  const passed = score >= PASS_MARK;
+
+  const attempts = LS.get(ATTEMPTS_KEY,[]);
+  attempts.push({date:Date.now(),score,max:maxScore,pct,passed,
+    bySubject,byDiff,duration:TEST_SECONDS-state.timeLeft,
+    subjects:[...state.testSubjects]});
+  LS.set(ATTEMPTS_KEY, attempts);
+
+  renderResults({score,maxScore,pct,passed,bySubject,byDiff,auto});
+  showScreen('scr-results');
+  renderStats();
+}
+
+/* ---------- RESULTS ---------- */
+function renderResults(r){
+  const ring = document.getElementById('scoreRing');
+  const deg = (r.score/600)*360;
+  ring.style.background = `conic-gradient(${r.passed?'#10b981':'#e11d48'} ${deg}deg, #221038 ${deg}deg)`;
+  document.getElementById('scoreVal').textContent = r.score;
+  document.getElementById('scorePct').textContent = r.pct + '%';
+  const v = document.getElementById('verdict');
+  v.textContent = r.passed ? 'PASS — You qualify for the next stage' : 'NOT YET — Aim for 510 / 600';
+  v.className = 'verdict ' + (r.passed?'pass':'fail');
+
+  const sb = document.getElementById('subjectBars');
+  sb.innerHTML = state.testSubjects.map(s=>{
+    const d = r.bySubject[s];
+    const p = d.t? Math.round((d.c/d.t)*100):0;
+    const color = p>=85?'#10b981':p>=60?'#f59e0b':'#e11d48';
+    return `<div class="bar-row">
+      <div class="lbl"><span>${SUBJECT_LABEL[s]}</span><span>${d.c}/${d.t} · ${p}%</span></div>
+      <div class="bar"><i style="width:${p}%;background:${color}"></i></div></div>`;
+  }).join('');
+
+  const db = document.getElementById('diffBars');
+  db.innerHTML = ['easy','hard','difficult'].map(d=>{
+    const x = r.byDiff[d];
+    const p = x.t? Math.round((x.c/x.t)*100):0;
+    const color = p>=85?'#10b981':p>=60?'#f59e0b':'#e11d48';
+    return `<div class="bar-row">
+      <div class="lbl"><span>${DIFF_LABEL[d]} (${DIFF_PTS[d]} pts)</span><span>${x.c}/${x.t} · ${p}%</span></div>
+      <div class="bar"><i style="width:${p}%;background:${color}"></i></div></div>`;
+  }).join('');
+
+  document.getElementById('recommendations').innerHTML = buildRecommendations(r);
+}
+
+/* ---------- RECOMMENDATION ENGINE ---------- */
+function buildRecommendations(r){
+  const recs = [];
+  const pct = s => { const d=r.bySubject[s]; return d&&d.t? (d.c/d.t)*100 : -1; };
+
+  if(pct('english')>=0 && pct('english')<85){
+    recs.push({t:'English Language', b:'Focus on: (1) vocabulary in context — read editorial columns and note how words behave in sentences; (2) SAT-style reading comprehension — identifying tone, purpose, and function of specific phrases; (3) grammar — subject–verb agreement, tense consistency, pronoun reference, and semicolon use. Use WAEC & JAMB Use of English past questions as drill material.'});
+  }
+  if(pct('math')>=0 && pct('math')<85){
+    recs.push({t:'Mathematics', b:'Priority topics: percentages, ratios & proportions, number series, simple & compound interest, probability ("at least one" and "without replacement"), algebraic identities, AP/GP, and logarithms. Practise under a timer — speed is part of the score. MAN Enugu–style competition questions build the reasoning muscle.'});
+  }
+  if(pct('gk')>=0 && pct('gk')<85){
+    recs.push({t:'General Knowledge', b:'DCF historically leans on: (1) Genetics — Mendel\'s laws, dominant/recessive traits, Punnett squares, DNA structure, mitosis vs meiosis; (2) Nigerian Government — arms of government, 1999 Constitution, electoral process; (3) International bodies — UN, AU, ECOWAS, SDGs; (4) Geography — African capitals, rivers, mountains; (5) Basic science — photosynthesis, pH, atmosphere composition.'});
+  }
+
+  const ePct = r.byDiff.easy.t? (r.byDiff.easy.c/r.byDiff.easy.t)*100 : 0;
+  const hPct = r.byDiff.hard.t? (r.byDiff.hard.c/r.byDiff.hard.t)*100 : 0;
+  const dPct = r.byDiff.difficult.t? (r.byDiff.difficult.c/r.byDiff.difficult.t)*100 : 0;
+
+  if(ePct < 80){
+    recs.push({t:'Foundational gaps', b:'You are losing points on Easy questions. That signals gaps in fundamentals rather than test technique. Rebuild the basics — definitions, formulas, and core rules — before drilling advanced material. Easy questions are the cheapest points; never leave them on the table.'});
+  } else if(hPct < 70){
+    recs.push({t:'Mid-tier reasoning', b:'You handle basics well but struggle with 2–3 step reasoning. Practise translating words into equations, interpreting data, and applying a rule to a new situation. SAT Level 1–2 Maths and WAEC comprehension passages are ideal.'});
+  } else if(dPct < 60){
+    recs.push({t:'Advanced reasoning', b:'Your foundation is solid but Difficult questions are costing you. Practise AP/GP, probability without replacement, genetics crosses, passage inference, and "most nearly means" vocabulary in context. Read each question twice before answering.'});
+  }
+
+  const used = TEST_SECONDS - state.timeLeft;
+  const mins = Math.floor(used/60);
+  if(state.timeLeft <= 60){
+    recs.push({t:'Timing', b:`You used almost the full 45 minutes (${mins} min). Aim to leave 3–5 minutes for review. Pace: ~40 s on Easy, ~45 s on Hard, ~55 s on Difficult. If a question exceeds 90 s, mark and move on.`});
+  }
+
+  if(!r.passed){
+    recs.push({t:'Overall Strategy', b:`You scored ${r.score}/600. The DCF benchmark is 510. Biggest gains come from: (1) eliminating careless errors on Easy questions, (2) mastering two or three high-frequency topics per subject, and (3) timed practice. Retake after two weeks of focused study — the pool is designed not to repeat.`});
+  } else {
+    recs.push({t:'Next Steps', b:'You are above the benchmark. Keep sharpening with timed practice, but shift energy toward Stage 3 (Research Project) — that is where most candidates are eliminated. Start identifying one specific, evidence-backed community problem you can propose a solution to.'});
+  }
+
+  return recs.map(x=>`<div class="rec"><b>${x.t}</b><p>${x.b}</p></div>`).join('');
+}
+
+/* ---------- REVIEW ---------- */
+function renderReview(){
+  const body = document.getElementById('reviewBody');
+  body.innerHTML = state.questions.map((q,i)=>{
+    const user = state.answers[i];
+    const ok = user === q.answer;
+    return `<div class="rev-item">
+      <div class="qmeta">
+        <span class="tag">${SUBJECT_LABEL[q.subject]}</span>
+        <span class="tag">${DIFF_LABEL[q.diff]}</span>
+        <span class="rev-tag ${ok?'correct':'wrong'}">${ok?'Correct':'Wrong'}</span>
+      </div>
+      ${q.passage?`<div class="passage" style="max-height:140px">${q.passage}</div>`:''}
+      <p class="qtext">${q.q}</p>
+      ${q.options.map((o,j)=>{
+        let cls='opt';
+        if(j===q.answer) cls+=' correct';
+        else if(j===user) cls+=' wrong';
+        return `<button class="${cls}" disabled><span class="k">${'ABCD'[j]}</span><span>${o}</span></button>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ---------- STATS ---------- */
+function renderStats(){
+  const attempts = LS.get(ATTEMPTS_KEY,[]);
+  const el = document.getElementById('statsBody');
+  if(!attempts.length){
+    el.innerHTML = '<p style="color:var(--muted);font-size:.9rem;margin:0">No attempts yet. Take your first test.</p>';
+    return;
+  }
+  const best = Math.max(...attempts.map(a=>a.score));
+  const last = attempts[attempts.length-1];
+  const lastSubs = (last.subjects||[]).map(s=>SUBJECT_SHORT[s]).join(' · ') || '—';
+  el.innerHTML = `
+    <div class="stat-row"><span>Attempts</span><span>${attempts.length}</span></div>
+    <div class="stat-row"><span>Best score</span><span>${best} / 600</span></div>
+    <div class="stat-row"><span>Last score</span><span>${last.score} / 600 (${last.pct}%)</span></div>
+    <div class="stat-row"><span>Last subjects</span><span>${lastSubs}</span></div>
+    <div class="stat-row"><span>Last result</span><span style="color:${last.passed?'#10b981':'#e11d48'}">${last.passed?'PASS':'Not yet'}</span></div>
+  `;
+}
+
+/* ---------- INIT ---------- */
+function init(){
+  renderStats();
+  window.App = {
+    startTest, showScreen:(id)=>{ if(id==='scr-review') renderReview(); showScreen(id); },
+    selectOption, nextQ, prevQ, resetPool,
+    toggleSubject, selectAllSubjects, clearAllSubjects, confirmSubjects
+  };
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+}
+init();
+
+return window.App;
+})();
+</script>
+</body>
+</html>

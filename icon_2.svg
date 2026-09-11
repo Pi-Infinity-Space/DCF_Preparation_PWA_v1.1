@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"    stop-color="#6d28d9"/>
+      <stop offset="0.55" stop-color="#9333ea"/>
+      <stop offset="1"    stop-color="#e11d48"/>
+    </linearGradient>
+    <radialGradient id="shine" cx="0.28" cy="0.22" r="0.75">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="capFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ede9fe"/>
+    </linearGradient>
+    <linearGradient id="capBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ddd6fe"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#fef3c7"/>
+      <stop offset="0.5" stop-color="#fcd34d"/>
+      <stop offset="1"   stop-color="#f59e0b"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0"   stop-color="#fde68a" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#fde68a" stop-opacity="0.28"/>
+      <stop offset="1"   stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#shine)"/>
+
+  <!-- Halo behind star -->
+  <circle cx="256" cy="165" r="120" fill="url(#halo)"/>
+
+  <!-- Radiating rays -->
+  <g stroke="#fde68a" stroke-width="4" stroke-linecap="round" opacity="0.6">
+    <line x1="256" y1="42"  x2="256" y2="66"/>
+    <line x1="152" y1="86"  x2="170" y2="104"/>
+    <line x1="360" y1="86"  x2="342" y2="104"/>
+    <line x1="108" y1="165" x2="140" y2="165"/>
+    <line x1="404" y1="165" x2="372" y2="165"/>
+  </g>
+
+  <!-- 4-point sparkle star -->
+  <path d="M 256 90
+           C 265 126.75, 282.25 138.75, 331 165
+           C 282.25 191.25, 265 203.25, 256 240
+           C 247 203.25, 229.75 191.25, 181 165
+           C 229.75 138.75, 247 126.75, 256 90 Z"
+        fill="url(#gold)"/>
+  <!-- Star inner highlight -->
+  <path d="M 256 118
+           C 260 140, 268 148, 290 165
+           C 268 182, 260 190, 256 212
+           C 252 190, 244 182, 222 165
+           C 244 148, 252 140, 256 118 Z"
+        fill="#fffbeb" opacity="0.9"/>
+
+  <!-- Graduation cap — mortarboard (diamond) -->
+  <path d="M 256 262 L 400 322 L 256 382 L 112 322 Z" fill="url(#capFace)"/>
+  <path d="M 112 322 L 256 382 L 400 322"
+        stroke="#c4b5fd" stroke-width="4" fill="none" opacity="0.55"/>
+
+  <!-- Cap base (fabric under board) -->
+  <path d="M 190 350 L 322 350 L 305 424 Q 256 448 207 424 Z" fill="url(#capBase)"/>
+  <path d="M 207 424 Q 256 448 305 424"
+        stroke="#7c3aed" stroke-width="3" fill="none" opacity="0.5"/>
+
+  <!-- Tassel cord -->
+  <path d="M 400 322 Q 442 350 432 396 Q 424 434 396 450"
+        stroke="url(#gold)" stroke-width="11"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- Tassel pom-pom -->
+  <circle cx="392" cy="454" r="18" fill="url(#gold)"/>
+  <circle cx="386" cy="447" r="5"  fill="#fffbeb" opacity="0.85"/>
+</svg>
